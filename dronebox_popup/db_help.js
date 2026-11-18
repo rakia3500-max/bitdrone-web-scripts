@@ -9,6 +9,9 @@
    K2(11-13): PC '쿠폰적용' 그림 단추(img alt, 글자 없음)도 시트로 — 11-12 15:10 녹화(1309)에서 여전히 로그인 화면으로 감
    S(11-13): PC 추가상품 목록 맨 위 '상품선택' 안내 줄 숨김(눌러도 반응 없는 줄, 1270·1294 녹화)
    R(11-12): 경로 글자 — 상세 'HOME'(#)과 펼쳐지지 않는 분류 이름을 실제 목록 주소로 (PC·휴대폰)
+   C-PC(11-18): PC 로그인 화면이 '바로 구매'로 열렸을 때 '비회원으로 바로 주문하기' 상자를 맨 위로 (11-14·16·17 매빅3E 녹화, 7초 만에 되돌아감)
+   R2(11-18): 로그인 화면 경로 줄의 깨진 글자 '/data/coupon_image/login-coupo' → '로그인'
+   P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
   var FREE = 50000;
@@ -215,9 +218,58 @@
     });
   }
 
+  // 2026-11-18 C-PC: PC 로그인 화면 — 휴대폰 C와 같은 뜻, PC는 로그인 상자 맨 위에 큰 상자로
+  function guestUpPc() {
+    if (path.indexOf('/member/login') < 0 || document.querySelector('.dbh-gp')) return;
+    var g = document.querySelector('.nonmember_join_box button, .nonmember_join_box a');
+    var box = document.querySelector('.member_login_box');
+    if (!g || !box || txt(g).replace(/\s/g, '') !== '비회원주문하기') return;   // '바로 구매'로 온 화면에만 있음
+    var c = document.createElement('div'); c.className = 'dbh-gp';
+    c.style.cssText = 'border:2px solid #1C88CB;background:#F2F8FD;padding:18px 22px;margin:0 0 26px;text-align:left';
+    c.innerHTML = '<div style="font-size:17px;font-weight:700;color:#191F28;margin-bottom:4px">가입 없이 바로 주문하기</div>' +
+      '<div style="font-size:13px;color:#4E5968;margin-bottom:12px;line-height:1.5">회원가입·로그인 없이 주문할 수 있어요. 주문 조회는 주문번호와 비밀번호로 합니다.</div>' +
+      '<a href="#" style="display:block;height:52px;line-height:52px;background:#1C88CB;color:#fff!important;font-size:16px;font-weight:700;text-align:center;text-decoration:none">비회원으로 바로 주문하기</a>';
+    c.querySelector('a').addEventListener('click', function (e) { e.preventDefault(); g.click(); });   // 원래 단추(비회원 주문 폼 제출) 그대로
+    box.insertBefore(c, box.firstChild);
+    var old = g.closest('.nonmember_join_box'); if (old) old.style.display = 'none';
+  }
+
+  // 2026-11-18 R2: 로그인 화면 경로 줄 '> /data/coupon_image/login-coupo'(스킨 쪽 깨진 이름표) → '> 로그인'
+  function crumbLogin() {
+    if (path.indexOf('/member/') < 0) return;
+    [].forEach.call(document.querySelectorAll('.location_cont em, .location_wrap em'), function (em) {
+      [].forEach.call(em.childNodes, function (n) {
+        if (n.nodeType === 3 && /\/data\//.test(n.textContent)) n.textContent = ' > ' + (path.indexOf('/member/login') >= 0 ? '로그인' : '회원');
+      });
+    });
+  }
+
+  // 2026-11-18 P: 단품(부품) 상품에 세트 안내 — 상품 번호: [안내 글, [[링크 글, 상품 번호], …]]
+  var SETS = {
+    '1000001373': ['이 상품은 <b>송신기 1개만</b> 들어 있어요 (수신기·충전 케이스 없음).',
+      [['MIC3 세트 (1TX + 1RX)', '1000001374'], ['MIC3 세트 (2TX + 1RX + 충전 케이스)', '1000001375']]]
+  };
+  function setGuide() {
+    if (path.indexOf('goods_view') < 0 || document.querySelector('.dbh-set')) return;
+    var m = location.search.match(/goodsNo=(\d+)/), s = m && SETS[m[1]];
+    if (!s) return;
+    var pc = !mob && document.querySelector('dl.item_price'), mo = mob && document.querySelector('.detail_info_top .price_box');
+    if (!pc && !mo) return;
+    var el = document.createElement('div'); el.className = 'dbh-set';
+    el.style.cssText = 'clear:both;float:left;width:100%;box-sizing:border-box;margin:6px 0 8px;padding:9px 12px;background:#FFF8E6;border:1px solid #F5D48A;font-size:13.5px;line-height:1.6;color:#333D4B;text-align:left';
+    var h = s[0] + '<br>처음 사신다면 세트를 보세요: ';
+    s[1].forEach(function (x, i) { h += (i ? ' · ' : '') + '<a href="/goods/goods_view.php?goodsNo=' + x[1] + '" style="color:#1C88CB;font-weight:700;text-decoration:underline">' + x[0] + '</a>'; });
+    el.innerHTML = h;
+    if (pc) { pc.parentNode.insertBefore(el, pc.nextSibling); return; }
+    // 휴대폰: 가격(strong.price·span.won·em) 바로 밑, 소개 글 앞 — 첫 화면 안
+    var intro = [].filter.call(mo.children, function (x) { return x.tagName === 'DIV' && !/secondhand/.test(x.className) && txt(x); })[0];
+    if (intro) mo.insertBefore(el, intro); else mo.appendChild(el);
+  }
+
   function run() {
     css();
-    [qaHelp, crumbFix, couponHelp].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
+    [qaHelp, crumbFix, couponHelp, crumbLogin, setGuide].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
+    if (!mob) { try { guestUpPc(); } catch (e) {} }
     if (!mob) return;                         // B·C·D·E는 휴대폰 화면만 (X는 CSS로 PC도)
     [smallChat, buyNote, guestUp, freeShip].forEach(function (f) { try { f(); } catch (e) {} });
   }
