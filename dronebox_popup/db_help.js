@@ -11,6 +11,7 @@
    R(11-12): 경로 글자 — 상세 'HOME'(#)과 펼쳐지지 않는 분류 이름을 실제 목록 주소로 (PC·휴대폰)
    C-PC(11-18): PC 로그인 화면이 '바로 구매'로 열렸을 때 '비회원으로 바로 주문하기' 상자를 맨 위로 (11-14·16·17 매빅3E 녹화, 7초 만에 되돌아감)
    R2(11-18): 로그인 화면 경로 줄의 깨진 글자 '/data/coupon_image/login-coupo' → '로그인'
+   A(11-18): PC 장바구니에 산업용 상품이 있으면 '이 구성으로 견적서 출력 / 전화 상담' 안내 줄 (M5T·M5TD 장바구니 이탈 3건, 사장님 시안 A 승인)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
@@ -266,8 +267,33 @@
     if (intro) mo.insertBefore(el, intro); else mo.appendChild(el);
   }
 
+  // 2026-11-18 A: PC 장바구니 — 산업용 상품이 담겨 있으면 견적·상담 안내 줄 (원래 '견적서 출력' 단추 기능을 그대로 부름)
+  var IND = /매트리스|Matrice|독\s?[234]|Dock\s?[234]|엔터프라이즈|Enterprise|젠뮤즈|Zenmuse|D-RTK|플라이카트|FlyCart|플라이트허브|FlightHub|테라|Terra|모디파이|Modify|Pix4D|미카센스|MicaSense|그렘시|Gremsy|산업용/i;
+  var IND_TEL = '070-7811-4422';                                  // 산업용 상품 화면·견적서에 적힌 번호와 같게
+  function quoteCart() {
+    if (mob || path.indexOf('/order/cart') < 0 || document.querySelector('.dbh-qc')) return;
+    var names = [].map.call(document.querySelectorAll('#frmCart a[href*="goods_view.php?goodsNo="], form a[href*="goods_view.php?goodsNo="]'), txt).join(' ');
+    if (!IND.test(names)) return;
+    var est = [].filter.call(document.querySelectorAll('button'), function (b) { return /견적서\s*출력/.test(txt(b)); })[0];
+    var all = [].filter.call(document.querySelectorAll('button'), function (b) { return /전체\s*상품\s*주문/.test(txt(b)); })[0];
+    if (!est || !all) return;
+    var wrap = est.parentElement;                                 // '견적서 출력'과 '전체 상품 주문'을 함께 품은 줄
+    while (wrap && !wrap.contains(all)) wrap = wrap.parentElement;
+    if (!wrap) return;
+    var c = document.createElement('div'); c.className = 'dbh-qc';
+    c.style.cssText = 'clear:both;border:2px solid #1C88CB;background:#F2F8FD;padding:14px 18px;margin:16px 0 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;text-align:left';
+    var bs = 'display:inline-block;padding:10px 16px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;';
+    c.innerHTML = '<div style="flex:1;min-width:300px"><div style="font-size:15px;font-weight:700;color:#191F28">산업용 장비는 견적서·상담 후 구매하셔도 됩니다</div>' +
+      '<div style="font-size:12.5px;color:#4E5968;margin-top:3px">지금 담은 구성 그대로 견적서를 뽑거나, 전화로 구성·납기·납품서류를 상의하세요. (평일 09:00~18:00)</div></div>' +
+      '<a href="#" data-q="e" style="' + bs + 'background:#1C88CB;color:#fff!important">이 구성으로 견적서 출력</a>' +
+      '<a href="tel:' + IND_TEL + '" style="' + bs + 'border:1px solid #1C88CB;color:#1C88CB!important;background:#fff">전화 상담 ' + IND_TEL + '</a>';
+    c.querySelector('[data-q="e"]').addEventListener('click', function (e) { e.preventDefault(); est.click(); });
+    wrap.parentNode.insertBefore(c, wrap);
+  }
+
   function run() {
     css();
+    try { quoteCart(); } catch (e) {}
     [qaHelp, crumbFix, couponHelp, crumbLogin, setGuide].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
     if (!mob) { try { guestUpPc(); } catch (e) {} }
     if (!mob) return;                         // B·C·D·E는 휴대폰 화면만 (X는 CSS로 PC도)
