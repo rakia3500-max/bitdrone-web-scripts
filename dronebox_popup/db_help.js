@@ -12,6 +12,7 @@
    C-PC(11-18): PC 로그인 화면이 '바로 구매'로 열렸을 때 '비회원으로 바로 주문하기' 상자를 맨 위로 (11-14·16·17 매빅3E 녹화, 7초 만에 되돌아감)
    R2(11-18): 로그인 화면 경로 줄의 깨진 글자 '/data/coupon_image/login-coupo' → '로그인'
    A(11-18): PC 장바구니에 산업용 상품이 있으면 '이 구성으로 견적서 출력 / 전화 상담' 안내 줄 (M5T·M5TD 장바구니 이탈 3건, 사장님 시안 A 승인)
+   G(11-18): 상세 구성품 이름(에어3S 콤보 'DJI 숄더 백')을 누르면 구성품 사진이 뜨게 (1555 녹화, 6번 연속 클릭)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
@@ -291,9 +292,44 @@
     wrap.parentNode.insertBefore(c, wrap);
   }
 
+  // 2026-11-18 G: 구성품 이름 → 사진 — 상품 번호: [[구성품 글자, 사진 주소(이미 올린 상품 사진), 설명], …]
+  var IMG = 'https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/';
+  var A3S_RC2 = IMG + '1000001246/image/detail/1000001236_detail_611.jpg', A3S_N3 = IMG + '1000001241/image/detail/1000001241_detail_786.jpg';
+  var BAG = '오른쪽 위 회색 가방이 <b>DJI 숄더 백</b>이에요 (세트에 1개 포함).';
+  var PART_PICS = {
+    '1000001555': [['DJI 숄더 백', A3S_RC2, BAG]], '1000001258': [['DJI 숄더 백', A3S_RC2, BAG]],
+    '1000001246': [['DJI 숄더 백', A3S_RC2, BAG]], '1000001241': [['DJI 숄더 백', A3S_N3, BAG]]
+  };
+  function picLayer(src, cap) {
+    css2();
+    var ly = document.createElement('div'); ly.className = 'dbh-ly';
+    ly.innerHTML = '<div class="in" role="dialog" aria-label="구성품 사진"><div class="grab"></div><h4>구성품 사진</h4>' +
+      '<img src="' + src + '" alt="플라이 모어 콤보 구성품" style="display:block;width:100%;height:auto;margin:6px 0 8px;border:1px solid #F2F4F6">' +
+      '<p class="sub">' + cap + '</p><button type="button" class="x" data-a="x">닫기</button></div>';
+    ly.addEventListener('click', function (e) { if (e.target === ly || e.target.closest('[data-a="x"]')) ly.remove(); });
+    document.body.appendChild(ly);
+  }
+  function partPics() {
+    if (path.indexOf('goods_view') < 0) return;
+    var m = location.search.match(/goodsNo=(\d+)/), list = m && PART_PICS[m[1]];
+    if (!list) return;
+    list.forEach(function (it) {
+      [].forEach.call(document.querySelectorAll('.item-card, td'), function (el) {
+        if (el.getAttribute('data-dbh-pic') || txt(el).indexOf(it[0]) !== 0 || txt(el).length > it[0].length + 12) return;
+        el.setAttribute('data-dbh-pic', '1'); el.style.cursor = 'pointer'; el.title = '사진 보기';
+        var chip = document.createElement('span');
+        chip.textContent = '사진'; chip.style.cssText = 'display:inline-block;margin-left:6px;padding:0 6px;font-size:11px;line-height:18px;border:1px solid #1C88CB;color:#1C88CB;border-radius:9px;vertical-align:1px;font-weight:600';
+        var q = el.querySelector('.item-qty'); if (q) el.insertBefore(chip, q); else el.appendChild(chip);
+        el.addEventListener('click', function (e) { e.preventDefault(); picLayer(it[1], it[2]); });
+      });
+    });
+  }
+  function partPicsLater() { partPics(); setTimeout(partPics, 1500); setTimeout(partPics, 4000); }   // 상세 본문이 늦게 그려질 때
+
   function run() {
     css();
     try { quoteCart(); } catch (e) {}
+    try { partPicsLater(); } catch (e) {}
     [qaHelp, crumbFix, couponHelp, crumbLogin, setGuide].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
     if (!mob) { try { guestUpPc(); } catch (e) {} }
     if (!mob) return;                         // B·C·D·E는 휴대폰 화면만 (X는 CSS로 PC도)

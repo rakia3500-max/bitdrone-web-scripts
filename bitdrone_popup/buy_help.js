@@ -7,6 +7,7 @@
    I(11-16): 아이콘 4칸 개편 — 산업용 DJI 공식수입·방문납품(700만↑)/무료배송·기술서포트·유지보수, 컨슈머 DJI 공식수입·방문납품/무료배송·적립·기술서포트
    U(11-13): 견적 상품은 PC 아래 고정 띠 글자를 '견적 요청하기 (카톡·전화)' 한 칸으로
    T(11-13): 타일을 누르면 아래에 숨긴 원래 정보 표 문구를 한 줄로(눌러도 반응 없던 '막힌 클릭' 대응)
+   L(11-18): 상세 본문의 구성품 이름 → 그 상품 링크 (M5T 804 '인텔리전트 플라이트 배터리'를 눌러도 반응 없던 막힌 클릭, 11-16·17 녹화)
    되돌리기: 카페24 스크립트 태그에서 이 파일만 빼면 원래대로 */
 (function () {
   if (window.__bdBuyHelp) return; window.__bdBuyHelp = 1;
@@ -252,5 +253,29 @@
       p.classList.add('bdh-pclick'); p.title = '기관·법인 견적 안내 보기'; p.addEventListener('click', jump);
     }
   }
+  // 2026-11-18 L: 상세 본문 속 구성품 이름에 상품 링크 — 상품 번호: [[글자, 링크할 상품 번호], …] (글자마다 본문 첫 번째 것만)
+  var PART_LINKS = { 804: [['인텔리전트 플라이트 배터리', 805]] };
+  function partLinks() {
+    var m = location.search.match(/product_no=(\d+)/) || location.pathname.match(/\/(\d+)\/category\//);
+    var list = m && PART_LINKS[+m[1]], root = document.getElementById('prdDetail');
+    if (!list || !root) return;
+    list.forEach(function (it) {
+      if (root.querySelector('a.bdh-part[data-p="' + it[1] + '"]')) return;
+      var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), n;
+      while ((n = w.nextNode())) {
+        var i = n.nodeValue.indexOf(it[0]);
+        if (i < 0 || (n.parentElement && n.parentElement.closest('a,button,h1,h2,h3,h4,th,script,style'))) continue;
+        var a = document.createElement('a');
+        a.className = 'bdh-part'; a.setAttribute('data-p', it[1]); a.href = '/product/detail.html?product_no=' + it[1];
+        a.title = '이 상품 보기'; a.textContent = it[0];
+        a.style.cssText = 'color:#1B64DA;text-decoration:underline;text-underline-offset:3px;font-weight:inherit';
+        var rest = n.splitText(i); rest.nodeValue = rest.nodeValue.slice(it[0].length);
+        n.parentNode.insertBefore(a, rest);
+        break;
+      }
+    });
+  }
+  function partLinksLater() { partLinks(); setTimeout(partLinks, 1500); setTimeout(partLinks, 4000); }   // 상세 본문이 늦게 그려질 때
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+  try { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', partLinksLater); else partLinksLater(); } catch (e) {}
 })();
