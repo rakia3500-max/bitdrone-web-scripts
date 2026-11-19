@@ -436,7 +436,8 @@
   //   DJI가 아닌 상품(잭커리 등) 첫 칸 = 정품 보증. PC는 정보 카드 위, 휴대폰은 가격 칸 끝. + '모델명' 줄 숨김(빛드론과 같게)
   var SW = /테라|Terra|모디파이|Modify|플라이트허브|FlightHub|Pix4D|픽스포디|라이선스|소프트웨어/i;
   function tiles4() {
-    if (path.indexOf('goods_view') < 0 || document.querySelector('.dbh-ivc')) return;
+    var old = document.querySelector('.dbh-ivc');
+    if (path.indexOf('goods_view') < 0 || (old && old.getAttribute('data-done'))) return;
     var pi = document.querySelector('input[name="set_goods_price"]'), price = pi ? +String(pi.value).replace(/[^0-9.]/g, '') : 0;
     var nm = document.title + ' ' + txt(document.querySelector('.item_detail_tit, .goods_name, .detail_tit'));
     var sw = SW.test(nm), ind = !sw && IND.test(nm), dji = /DJI/i.test(nm) || !/Jackery|잭커리|CubePilot|큐브|Here4|풀리맥스|Fullymax|스카이킥|Skykick|Hexsoon|MicaSense|미카센스|Gremsy|CZI/i.test(nm);
@@ -479,6 +480,8 @@
     }
     var box = document.createElement('div'); box.className = 'dbh-ivc' + (mob ? ' mo' : '');
     box.innerHTML = '<div class="t n' + T.length + '">' + T.join('') + '</div>';
+    if (sw || ind || amt) box.setAttribute('data-done', '1');   // 컨슈머인데 적립 금액이 아직 안 그려졌으면 다음 시도에서 다시 그림
+    if (old) { old.parentNode.replaceChild(box, old); return; }
     if (!mob) {
       var L = document.querySelector('.item_detail_list'); if (!L) return;
       var card = L.querySelector('.dbh-inf');
@@ -490,7 +493,10 @@
     }
   }
 
-  function visitLater() { visitRule(); infoCard(); tiles4(); [1500, 4000].forEach(function (t) { setTimeout(function () { visitRule(); infoCard(); }, t); }); }   // 상세 정보 줄 스크립트(data-bdinfo)가 늦게 그림
+  function visitLater() {   // 단계마다 따로 시도(한 단계가 페이지가 덜 그려져 실패해도 나머지·다시 시도는 그대로) — 11-19 1572 실화면에서 아이콘·숨김이 통째로 빠진 것
+    var go = function () { [visitRule, infoCard, tiles4].forEach(function (f) { try { f(); } catch (e) {} }); };
+    go(); [800, 1500, 3000, 5000, 8000].forEach(function (t) { setTimeout(go, t); });
+  }   // 상세 정보 줄 스크립트(data-bdinfo)가 늦게 그림
 
   // 2026-11-19 I: PC 상세 정보 줄(제조사·구매서류·기술지원·방문 납품·고객상담)을 연회색 카드 2칸으로 (사장님 "제조사부터 너무 없어 보인다" → 시안 OK)
   //   + 추가상품 이름 칸은 단어 단위 줄바꿈('O4 그라운드 스테/이션'처럼 끊기던 것).
