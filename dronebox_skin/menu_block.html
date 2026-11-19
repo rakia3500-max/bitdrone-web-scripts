@@ -1,0 +1,89 @@
+<!-- 전체 분류 메뉴 시안C 2026-11-16 시작 -->
+<style>
+.gnb_allmenu{display:none!important}
+.header_gnb{position:relative}
+.header_gnb .gnb .btn_all_menu_open{display:flex!important;align-items:center;gap:10px;width:auto!important;padding:0 22px 0 18px!important;background:#1f8ad0!important;color:#fff!important;font-weight:700;font-size:15px;text-decoration:none!important}
+.header_gnb .gnb .btn_all_menu_open img{width:22px!important;height:auto!important}
+.header_gnb .gnb .btn_all_menu_open:after{content:'전체 분류'}
+.header_gnb .gnb .layer_gnb_box{padding-left:150px!important}
+.header_gnb .gnb .depth0>li{background:none!important;border:0!important;padding:0 18px!important}
+.header_gnb .gnb .depth0>li:before,.header_gnb .gnb .depth0>li:after,.header_gnb .gnb .depth0>li>a:before,.header_gnb .gnb .depth0>li>a:after{display:none!important}
+.header_gnb .gnb .depth0>li>a{font-size:15px!important;font-weight:600!important}
+.header_gnb .gnb .depth0 .dbxq>a{color:#17202a}
+.header_gnb .gnb .depth0 .dbxq>a:hover{color:#1f8ad0}
+.header_gnb .gnb .depth0 .dbxnew>a{color:#1f8ad0!important}
+#dbxC{display:none;position:absolute;left:0;right:0;top:100%;z-index:1000;background:#fff;border-top:3px solid #1f8ad0;box-shadow:0 14px 28px rgba(20,30,40,.12)}
+#dbxC.on{display:block}
+#dbxC .in{width:1100px;margin:0 auto;padding:24px 0 28px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+#dbxC .tile{border:1px solid #e5e9ee;border-radius:14px;padding:16px 16px 14px;display:grid;grid-template-columns:80px 1fr;gap:12px;align-items:start;background:#fff;text-align:left}
+#dbxC .tile:hover{border-color:#b9d9ee;box-shadow:0 4px 14px rgba(31,138,208,.08)}
+#dbxC .ph{display:flex;align-items:center;justify-content:center;width:80px;height:80px;background:#f4f6f8;border-radius:10px;overflow:hidden}
+#dbxC .ph img{width:84%;height:84%;object-fit:contain;mix-blend-mode:multiply}
+#dbxC h4{font-size:16px;font-weight:700;margin:2px 0 6px;color:#17202a;line-height:1.35}
+#dbxC h4 a{color:inherit}
+#dbxC h4 a:hover{color:#1f8ad0}
+#dbxC .s{font-size:13px;line-height:1.8;color:#3d4955}
+#dbxC .s a{display:inline-block;white-space:nowrap;margin-right:11px;color:#3d4955}
+#dbxC .s a:hover{color:#1f8ad0;text-decoration:underline}
+#dbxC .newt{background:#eaf4fb;border-color:#cfe4f3;grid-template-columns:1fr}
+#dbxC .newt h4{color:#156fab}
+#dbxC .newt .btn{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:#fff;background:#1f8ad0;padding:8px 14px;border-radius:8px}
+/* 11-19 사장님 "촬영용 드론을 누르면 촬영용 드론만 저렇게" → 위 줄 메뉴에 마우스를 올리면 그 분류 하나만 크게 */
+#dbxS{display:none;position:absolute;left:0;right:0;top:100%;z-index:1000;background:#fff;border-top:3px solid #1f8ad0;box-shadow:0 14px 28px rgba(20,30,40,.12)}
+#dbxS.on{display:block}
+#dbxS .in{width:1100px;margin:0 auto;padding:24px 0 28px;display:grid;grid-template-columns:240px 1fr;gap:28px;text-align:left}
+#dbxS .hd h3{font-size:22px;font-weight:700;color:#17202a;margin:4px 0 8px}
+#dbxS .hd p{font-size:13px;color:#6b7684;line-height:1.6;margin:0 0 14px}
+#dbxS .hd .btn{display:inline-block;font-size:13px;font-weight:700;color:#fff;background:#1f8ad0;padding:9px 16px;border-radius:8px}
+#dbxS .sub{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 10px;margin-bottom:16px}
+#dbxS .sub a{display:block;padding:8px 12px;border:1px solid #e5e9ee;border-radius:8px;font-size:14px;color:#3d4955;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dbxS .sub a:hover{border-color:#1f8ad0;color:#1f8ad0}
+#dbxS .ps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+#dbxS .ps a{display:block;border:1px solid #e5e9ee;border-radius:12px;padding:10px;color:#17202a;font-size:13px;font-weight:600;line-height:1.4}
+#dbxS .ps a:hover{border-color:#b9d9ee;box-shadow:0 4px 14px rgba(31,138,208,.08)}
+#dbxS .ps span{display:flex;align-items:center;justify-content:center;height:110px;background:#f4f6f8;border-radius:8px;margin-bottom:8px;overflow:hidden}
+#dbxS .ps img{width:84%;height:84%;object-fit:contain;mix-blend-mode:multiply}
+.header_gnb .gnb .depth0 .dbxq.dbxon>a{color:#1f8ad0}
+</style>
+<script>
+(function(){
+var D=[{"k": "shoot", "t": "촬영용 드론", "u": "/goods/goods_list.php?cateCd=002019001", "s": [["매빅4 프로", "/goods/goods_list.php?cateCd=002019001031"], ["매빅3 프로", "/goods/goods_list.php?cateCd=002019001025"], ["매빅3 클래식", "/goods/goods_list.php?cateCd=002019001024"], ["매빅3", "/goods/goods_list.php?cateCd=002019001020"], ["에어3S", "/goods/goods_list.php?cateCd=002019001029"], ["에어3", "/goods/goods_list.php?cateCd=002019001027"], ["미니5 프로", "/goods/goods_list.php?cateCd=002019001028"], ["미니3 프로", "/goods/goods_list.php?cateCd=002019001023"], ["아바타", "/goods/goods_list.php?cateCd=002019003"], ["인스파이어3", "/goods/goods_list.php?cateCd=002019014"], ["팬텀4", "/goods/goods_list.php?cateCd=002019010"]], "i": "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/05/20/1000001305/1000001305_main_072.jpg", "pu": "/goods/goods_view.php?goodsNo=1000001305", "ps": [["매빅4 프로 플라이모어 콤보", "/goods/goods_view.php?goodsNo=1000001305", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/05/20/1000001305/1000001305_main_072.jpg"], ["에어3S 플라이 모어 콤보", "/goods/goods_view.php?goodsNo=1000001246", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/24/10/42/1000001246/1000001236_main_09.jpg"], ["미니5 프로 플라이모어 콤보", "/goods/goods_view.php?goodsNo=1000001383", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/09/38/1000001383/1000001383_main_089.jpg"], ["아바타 360", "/goods/goods_view.php?goodsNo=1000001430", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/03/13/1000001430/1000001430_main_074.jpg"]]}, {"k": "start", "t": "입문·완구 드론", "u": "/goods/goods_main.php?sno=94", "s": [["DJI 네오", "/goods/goods_list.php?cateCd=002019015"], ["DJI 플립", "/goods/goods_list.php?cateCd=002019017"], ["DJI 리토", "/goods/goods_list.php?cateCd=002019020"], ["텔로", "/goods/goods_list.php?cateCd=002019002"], ["완구·드론 축구", "/goods/goods_list.php?cateCd=002031"]], "i": "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/11/46/1000001405/1000001405_main_098.jpg", "pu": "/goods/goods_view.php?goodsNo=1000001405", "ps": [["네오2 플라이 모어 콤보", "/goods/goods_view.php?goodsNo=1000001405", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/11/46/1000001405/1000001405_main_098.jpg"], ["플립 플라이 모어 콤보", "/goods/goods_view.php?goodsNo=1000001279", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/01/03/1000001279/1000001279_main_018.jpg"], ["리토 X1 플라이 모어 콤보", "/goods/goods_view.php?goodsNo=1000001437", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/04/17/1000001437/1000001437_main_05.jpg"], ["스카이킥 EVO 드론축구 공인구", "/goods/goods_view.php?goodsNo=1000001209", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/24/09/37/1000001209/1000001209_main_055.jpg"]]}, {"k": "ind", "t": "산업용 드론", "u": "/goods/goods_main.php?sno=49", "s": [["매트리스 5", "/goods/goods_list.php?cateCd=002019008005"], ["매트리스 4", "/goods/goods_list.php?cateCd=002019008003"], ["드론 스테이션", "/goods/goods_list.php?cateCd=002019018"], ["매트리스 400", "/goods/goods_list.php?cateCd=002019008004"], ["매빅3 엔터프라이즈", "/goods/goods_list.php?cateCd=002019001022"], ["매트리스 350", "/goods/goods_list.php?cateCd=002019008001"], ["매트리스 30", "/goods/goods_list.php?cateCd=002019008002"], ["페이로드", "/goods/goods_list.php?cateCd=002019019"], ["특수카메라", "/goods/goods_list.php?cateCd=002020"], ["CZI", "/goods/goods_list.php?cateCd=002032"], ["산업용 부품", "/goods/goods_list.php?cateCd=002030"]], "i": "https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261109/56952ce839b8eb1b7c3ae0cbd06660e1.jpg", "pu": "/goods/goods_view.php?goodsNo=1000001572", "ps": [["매트리스 5T", "/goods/goods_view.php?goodsNo=1000001572", "https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261109/56952ce839b8eb1b7c3ae0cbd06660e1.jpg"], ["매트리스 4T", "/goods/goods_view.php?goodsNo=1000001271", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/01/02/1000001271/1000001271_main_015.jpg"], ["독3 + 매트리스 4TD", "/goods/goods_view.php?goodsNo=1000001409", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/12/52/1000001409/1000001409_main_095.jpg"], ["젠뮤즈 H30T", "/goods/goods_view.php?goodsNo=1000001179", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/24/05/20/1000001179/1000001179_main_064.jpg"]]}, {"k": "agri", "t": "농업용 드론", "u": "/goods/goods_list.php?cateCd=002025", "s": [["농업용 드론", "/goods/goods_list.php?cateCd=002025"], ["FC 컨트롤러", "/goods/goods_list.php?cateCd=002023"]], "i": "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/02/08/1000001420/1000001420_main_070.jpg", "pu": "/goods/goods_view.php?goodsNo=1000001420", "ps": [["풀리맥스 배터리 22000mAh", "/goods/goods_view.php?goodsNo=1000001420", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/02/08/1000001420/1000001420_main_070.jpg"], ["K3APRO 비행컨트롤러", "/goods/goods_view.php?goodsNo=1000001001", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/23/06/23/1000001001/1000001001_main_041.png"], ["Cube Orange+", "/goods/goods_view.php?goodsNo=1000001422", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/02/08/1000001422/1000001422_main_057.png"], ["Here4 RTK GNSS", "/goods/goods_view.php?goodsNo=1000001421", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/02/08/1000001421/1000001421_main_022.jpg"]]}, {"k": "cam", "t": "카메라·짐벌·마이크", "u": "/goods/goods_main.php?sno=95", "s": [["오즈모 포켓", "/goods/goods_list.php?cateCd=002019006003"], ["오즈모 모바일", "/goods/goods_list.php?cateCd=002019006002"], ["오즈모 360", "/goods/goods_list.php?cateCd=002019006004"], ["오즈모 나노", "/goods/goods_list.php?cateCd=002019006005"], ["오즈모 액션", "/goods/goods_list.php?cateCd=002019012"], ["로닌 짐벌", "/goods/goods_list.php?cateCd=002019007"], ["마이크", "/goods/goods_list.php?cateCd=002019013"]], "i": "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/07/27/1000001522/1000001522_main_014.jpg", "pu": "/goods/goods_view.php?goodsNo=1000001522", "ps": [["오즈모 포켓 4P", "/goods/goods_view.php?goodsNo=1000001522", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/07/27/1000001522/1000001522_main_014.jpg"], ["오즈모 액션 6", "/goods/goods_view.php?goodsNo=1000001408", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/11/47/1000001408/1000001408_main_060.jpg"], ["RS 5 콤보", "/goods/goods_view.php?goodsNo=1000001415", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/01/05/1000001415/1000001415_main_078.jpg"], ["마이크 미니 2S", "/goods/goods_view.php?goodsNo=1000001539", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/08/32/1000001539/1000001539_main_071.jpg"]]}, {"k": "sw", "t": "소프트웨어", "u": "/goods/goods_list.php?cateCd=002026", "s": [["DJI 테라·모디파이", "/goods/goods_list.php?cateCd=002026001"], ["DJI 플라이트허브", "/goods/goods_list.php?cateCd=002026002"], ["Pix4D", "/goods/goods_list.php?cateCd=002026003"]], "i": "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/07/30/1000001343/1000001144_main_066.jpg", "pu": "/goods/goods_view.php?goodsNo=1000001343", "ps": [["DJI 테라 플래그십", "/goods/goods_view.php?goodsNo=1000001343", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/07/30/1000001343/1000001144_main_066.jpg"], ["플라이트허브 2 엔터프라이즈", "/goods/goods_view.php?goodsNo=1000001538", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/07/29/1000001538/1000001191_main_083.jpg"], ["Pix4D 클라우드 프로", "/goods/goods_view.php?goodsNo=1000001498", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/05/19/1000001498/1000001496_main_030.jpg"]]}, {"k": "parts", "t": "배터리·부품", "u": "/goods/goods_list.php?cateCd=002028", "s": [["파워뱅크", "/goods/goods_list.php?cateCd=002034"], ["배터리", "/goods/goods_list.php?cateCd=002028"], ["충전기", "/goods/goods_list.php?cateCd=002029"], ["조종기·시뮬레이터", "/goods/goods_list.php?cateCd=002027"], ["FC 컨트롤러", "/goods/goods_list.php?cateCd=002023"], ["액세서리", "/goods/goods_list.php?cateCd=002033"]], "i": "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/06/23/1000001312/1000001312_main_055.jpg", "pu": "/goods/goods_view.php?goodsNo=1000001312", "ps": [["매빅4 프로 배터리", "/goods/goods_view.php?goodsNo=1000001312", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/06/23/1000001312/1000001312_main_055.jpg"], ["농업용 배터리", "/goods/goods_view.php?goodsNo=1000001420", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/26/02/08/1000001420/1000001420_main_070.jpg"], ["RC Pro 2 조종기", "/goods/goods_view.php?goodsNo=1000001325", "https://cdn-pro-web-153-231.cdn-nhncommerce.com/dronetr7262_godomall_com/data/goods/25/07/29/1000001325/1000001325_main_051.jpeg"]]}], Q=[["촬영용 드론", "/goods/goods_list.php?cateCd=002019001"], ["입문 드론", "/goods/goods_main.php?sno=94"], ["산업용 드론", "/goods/goods_main.php?sno=49"], ["카메라·짐벌", "/goods/goods_main.php?sno=95"]], NEW='/goods/goods_main.php?sno=92';
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function build(){
+  var hg=document.querySelector('.header_gnb'), btn=hg&&hg.querySelector('.btn_all_menu_open'), ul=hg&&hg.querySelector('.depth0');
+  if(!hg||!btn||document.getElementById('dbxC'))return;
+  if(ul&&!ul.querySelector('.dbxq')){
+    var first=ul.firstElementChild;
+    for(var i=0;i<Q.length;i++){var li=document.createElement('li');li.className='dbxq';li.innerHTML='<a href="'+Q[i][1]+'">'+esc(Q[i][0])+'</a>';ul.insertBefore(li,first);}
+    if(first){first.className+=' dbxnew';var fa=first.querySelector('a');if(fa){fa.setAttribute('href',NEW);fa.textContent='새상품';}}
+  }
+  var h='<div class="in">';
+  for(var j=0;j<D.length;j++){var g=D[j],s='';
+    for(var k=0;k<g.s.length;k++)s+='<a href="'+g.s[k][1]+'">'+esc(g.s[k][0])+'</a>';
+    h+='<div class="tile"><a class="ph" href="'+g.pu+'"><img src="'+g.i+'" alt="" loading="lazy"></a><div><h4><a href="'+g.u+'">'+esc(g.t)+'</a></h4><div class="s">'+s+'</div></div></div>';}
+  h+='<div class="tile newt"><div><h4>새로 들어온 상품</h4><div class="s">새로 올린 DJI 신제품과<br>액세서리를 모아 봤어요.</div><a class="btn" href="'+NEW+'">새상품 보기</a></div></div></div>';
+  var p=document.createElement('div');p.id='dbxC';p.innerHTML=h;hg.appendChild(p);
+  var t;function on(){clearTimeout(t);p.className='on';}function off(){clearTimeout(t);t=setTimeout(function(){p.className='';},200);}
+  btn.addEventListener('mouseenter',on);btn.addEventListener('mouseleave',off);p.addEventListener('mouseenter',on);p.addEventListener('mouseleave',off);
+  btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();if(p.className==='on'){p.className='';}else{on();}},true);
+  document.addEventListener('click',function(e){if(!p.contains(e.target)&&!btn.contains(e.target))p.className='';});
+  var S=document.createElement('div');S.id='dbxS';hg.appendChild(S);var st,cur=null;
+  function sOff(){clearTimeout(st);st=setTimeout(function(){S.className='';if(cur){cur.className=cur.className.replace(' dbxon','');cur=null;}},200);}
+  function sOn(li,g){clearTimeout(st);clearTimeout(t);p.className='';
+    if(cur&&cur!==li)cur.className=cur.className.replace(' dbxon','');cur=li;if(li.className.indexOf('dbxon')<0)li.className+=' dbxon';
+    if(S.getAttribute('data-k')!==g.k){var sub='',ps='';
+      for(var k=0;k<g.s.length;k++)sub+='<a href="'+g.s[k][1]+'">'+esc(g.s[k][0])+'</a>';
+      for(var m=0;m<(g.ps||[]).length;m++)ps+='<a href="'+g.ps[m][1]+'"><span><img src="'+g.ps[m][2]+'" alt="" loading="lazy"></span>'+esc(g.ps[m][0])+'</a>';
+      S.innerHTML='<div class="in"><div class="hd"><h3>'+esc(g.t)+'</h3><p>'+g.s.length+'개 분류 · 대표 상품을 먼저 보여 드려요.</p><a class="btn" href="'+g.u+'">'+esc(g.t)+' 전체 보기</a></div><div><div class="sub">'+sub+'</div><div class="ps">'+ps+'</div></div></div>';
+      S.setAttribute('data-k',g.k);}
+    S.className='on';}
+  S.addEventListener('mouseenter',function(){clearTimeout(st);});S.addEventListener('mouseleave',sOff);
+  btn.addEventListener('mouseenter',function(){clearTimeout(st);S.className='';if(cur){cur.className=cur.className.replace(' dbxon','');cur=null;}});
+  if(ul){var qs=ul.querySelectorAll('.dbxq');for(var q=0;q<qs.length;q++){(function(li){var a=li.querySelector('a'),h=a&&a.getAttribute('href'),g=null;
+    for(var j=0;j<D.length;j++)if(D[j].u===h){g=D[j];break;}
+    if(!g)return;li.addEventListener('mouseenter',function(){sOn(li,g);});li.addEventListener('mouseleave',sOff);})(qs[q]);}}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
+})();
+</script>
+<!-- 전체 분류 메뉴 시안C 2026-11-16 끝 -->
