@@ -19,6 +19,7 @@
    G(11-18): 상세 구성품 이름(에어3S 콤보 'DJI 숄더 백')을 누르면 구성품 사진이 뜨게 (1555 녹화, 6번 연속 클릭)
    V(11-19): '구매시 방문 납품' 줄 — 빛드론과 같게 판매가 700만 원 이상만 보이고, 미만은 숨김(없는 700만↑ 상품엔 넣음)
    S(11-19): 검색 결과 위 '대표 기체' 띠(검색정렬 시안 B안) + 검색 화면 'BEST n' 숨김(C안)
+   T(11-19): 상품 화면 아이콘 4칸(빛드론과 같은 모양·규칙, 'DJI 정품') + 모델명·구매혜택·배송비 줄 숨김(휴대폰 배송정보 칸도) — 사장님 시안 OK
    K2(11-19): 휴대폰 상품 화면 구매 창이 열려 있는 동안 상담 동그라미 숨김(가격 줄을 가림)
    I(11-19): PC 상세 정보 줄(제조사~고객상담)을 연회색 카드 2칸으로 + 추가상품 이름 칸 단어 단위 줄바꿈 + 이름·값 줄 세로 쌓임 방지(값 칸 남은 폭)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
@@ -429,7 +430,67 @@
       }
     });
   }
-  function visitLater() { visitRule(); infoCard(); [1500, 4000].forEach(function (t) { setTimeout(function () { visitRule(); infoCard(); }, t); }); }   // 상세 정보 줄 스크립트(data-bdinfo)가 늦게 그림
+  // 2026-11-19 T: 아이콘 4칸 — 사장님 "아이콘을 넣자 4개로 빛드론처럼"(빛드론 buy_help.js 4칸과 같은 모양·규칙, 드론박스는 'DJI 정품')
+  //   컨슈머 = DJI 정품 / 무료배송(5만 원 이상) 또는 엔지니어 방문납품(판매가 700만 원 이상) / 적립 / 기술서포트
+  //   산업용(IND 이름 규칙) = DJI 정품 / 무료배송·방문납품 / 기술서포트 / 유지보수 지원 · 소프트웨어 = 정품 라이선스 / 납품 서류 / 기술 지원
+  //   DJI가 아닌 상품(잭커리 등) 첫 칸 = 정품 보증. PC는 정보 카드 위, 휴대폰은 가격 칸 끝. + '모델명' 줄 숨김(빛드론과 같게)
+  var SW = /테라|Terra|모디파이|Modify|플라이트허브|FlightHub|Pix4D|픽스포디|라이선스|소프트웨어/i;
+  function tiles4() {
+    if (path.indexOf('goods_view') < 0 || document.querySelector('.dbh-ivc')) return;
+    var pi = document.querySelector('input[name="set_goods_price"]'), price = pi ? +String(pi.value).replace(/[^0-9.]/g, '') : 0;
+    var nm = document.title + ' ' + txt(document.querySelector('.item_detail_tit, .goods_name, .detail_tit'));
+    var sw = SW.test(nm), ind = !sw && IND.test(nm), dji = /DJI/i.test(nm) || !/Jackery|잭커리|CubePilot|큐브|Here4|풀리맥스|Fullymax|스카이킥|Skykick|Hexsoon|MicaSense|미카센스|Gremsy|CZI/i.test(nm);
+    var mm = (document.body.textContent || '').replace(/\s+/g, ' ').match(/적립 마일리지\s*:?\s*\+?\s*([\d,]+)\s*원/), amt = mm ? (+mm[1].replace(/,/g, '')).toLocaleString('ko-KR') : '', pct = amt && price ? Math.round(+amt.replace(/,/g, '') * 100 / price) : 0;
+    function ic(d) { return '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; }
+    var I = {
+      badge: ic('<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'),
+      truck: ic('<path d="M3 6h11v9H3zM14 9h4l3 3v3h-7"/><circle cx="7" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/>'),
+      coin: ic('<circle cx="12" cy="12" r="8"/><path d="M9.5 9.5h4a1.8 1.8 0 0 1 0 3.6h-3a1.8 1.8 0 0 0 0 3.6h4M12 8v1.5M12 16.7v1.3"/>'),
+      tool: ic('<path d="M14.5 6.5a4 4 0 0 0-5 5L4 17l3 3 5.5-5.5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z"/>'),
+      doc: ic('<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>'),
+      van: ic('<path d="M2 7h12v8H2zM14 10h4l3 3v2h-7"/><circle cx="6" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/><path d="M5 10.5h5"/>'),
+      phone: ic('<path d="M6 3h3l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z"/>')
+    };
+    var T = [];
+    if (sw) {
+      T.push('<div><i>' + I.badge + '</i><b>정품 라이선스</b><em>정품만 판매합니다</em></div>');
+      T.push('<div><i>' + I.doc + '</i><b>납품 서류</b><em>공공기관·학교·기업</em></div>');
+      T.push('<div><i>' + I.phone + '</i><b>기술 지원</b><em>드론박스 고객센터 상담</em></div>');
+    } else {
+      T.push('<div><i>' + I.badge + '</i>' + (dji ? '<b>DJI 정품</b><em>정품만 판매합니다</em>' : '<b>정품 보증</b><em>정품만 판매합니다</em>') + '</div>');
+      T.push(price >= 7000000 ? '<div><i>' + I.van + '</i><b>엔지니어 방문납품</b><em>교육·초기 세팅 포함</em></div>' : '<div><i>' + I.truck + '</i><b>무료배송</b><em>5만 원 이상 구매 시</em></div>');
+      if (ind) {
+        T.push('<div><i>' + I.phone + '</i><b>기술서포트 제공</b><em>영상·유선 지원</em></div>');
+        T.push('<div><i>' + I.tool + '</i><b>유지보수 지원</b><em>장치신고·보험</em></div>');
+      } else {
+        if (amt && pct > 0) T.push('<div class="pt"><i>' + I.coin + '</i><b>' + amt + '원</b><em>회원 적립 ' + pct + '%</em></div>');
+        T.push('<div><i>' + I.phone + '</i><b>기술서포트 제공</b><em>영상·유선 지원</em></div>');
+      }
+    }
+    if (!document.getElementById('dbh-ivc-css')) {
+      var c = document.createElement('style'); c.id = 'dbh-ivc-css';
+      c.textContent = '.dbh-ivc{clear:both;float:left;width:100%;box-sizing:border-box;margin:10px 0 2px}.dbh-ivc .t{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.dbh-ivc .t.n3{grid-template-columns:repeat(3,minmax(0,1fr))}' +
+        '.dbh-ivc .t div{border:1.5px solid #E5E8EB;border-radius:10px;padding:12px 6px 11px;text-align:center;background:#fff}' +
+        '.dbh-ivc i{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#F2F4F6;color:#191F28;margin-bottom:6px}' +
+        '.dbh-ivc b{display:block;font-size:14px;color:#191F28;line-height:1.3;word-break:keep-all}.dbh-ivc em{display:block;font-style:normal;font-size:12px;color:#6B7684;margin-top:2px;line-height:1.35;word-break:keep-all}' +
+        '.dbh-ivc .pt{border-color:#7BD4A0;background:#F0FBF4}.dbh-ivc .pt i{background:#D3F5DF;color:#0B7A3B}.dbh-ivc .pt b{color:#0B7A3B;font-size:15px}' +
+        '.dbh-ivc.mo{float:none;margin:12px 0 4px}.dbh-ivc.mo .t,.dbh-ivc.mo .t.n3{grid-template-columns:repeat(2,minmax(0,1fr))}';
+      (document.head || document.documentElement).appendChild(c);
+    }
+    var box = document.createElement('div'); box.className = 'dbh-ivc' + (mob ? ' mo' : '');
+    box.innerHTML = '<div class="t n' + T.length + '">' + T.join('') + '</div>';
+    if (!mob) {
+      var L = document.querySelector('.item_detail_list'); if (!L) return;
+      var card = L.querySelector('.dbh-inf');
+      if (card) L.insertBefore(box, card); else L.appendChild(box);
+    } else {
+      var pb = document.querySelector('.detail_info_top .price_box'); if (!pb) return;
+      pb.appendChild(box);
+      [].forEach.call(document.querySelectorAll('.detail_sub_info dl'), function (dl) { var t = dl.querySelector('dt'); if (t && txt(t) === '배송정보') dl.style.display = 'none'; });   // 휴대폰 배송정보·적립 줄도 아이콘 칸과 겹쳐 숨김
+    }
+  }
+
+  function visitLater() { visitRule(); infoCard(); tiles4(); [1500, 4000].forEach(function (t) { setTimeout(function () { visitRule(); infoCard(); }, t); }); }   // 상세 정보 줄 스크립트(data-bdinfo)가 늦게 그림
 
   // 2026-11-19 I: PC 상세 정보 줄(제조사·구매서류·기술지원·방문 납품·고객상담)을 연회색 카드 2칸으로 (사장님 "제조사부터 너무 없어 보인다" → 시안 OK)
   //   + 추가상품 이름 칸은 단어 단위 줄바꿈('O4 그라운드 스테/이션'처럼 끊기던 것).
@@ -454,6 +515,7 @@
     var fold = L.querySelector('[data-bdc="fold"]');
     var priceRow = [].filter.call(L.children, function (dl) { var t = dl.tagName === 'DL' && dl.querySelector('dt'); return t && txt(t) === '판매가'; })[0];
     if (fold && priceRow && priceRow.nextElementSibling !== fold) L.insertBefore(fold, priceRow.nextSibling);
+    [].forEach.call(L.children, function (dl) { var t = dl.tagName === 'DL' && dl.querySelector('dt'); if (t && /^(모델명|구매혜택|배송비)$/.test(txt(t))) dl.classList.add('dbh-hid'); });   // 11-19 '모델명' 줄 숨김(빛드론과 같게) + 구매혜택·배송비는 아이콘 칸(적립·무료배송/방문납품)과 겹쳐 숨김(사장님)
     var rows = [].filter.call(L.children, function (dl) {
       var t = dl.tagName === 'DL' && dl.querySelector('dt');
       return t && INF_KEYS[txt(t)] && !dl.classList.contains('dbh-hid') && (dl.classList.contains('dbh-inr') || getComputedStyle(dl).display !== 'none');
