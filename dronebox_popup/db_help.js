@@ -440,7 +440,9 @@
     if (path.indexOf('goods_view') < 0 || (old && old.getAttribute('data-done'))) return;
     var pi = document.querySelector('input[name="set_goods_price"]'), price = pi ? +String(pi.value).replace(/[^0-9.]/g, '') : 0;
     var nm = document.title + ' ' + txt(document.querySelector('.item_detail_tit, .goods_name, .detail_tit'));
-    var sw = SW.test(nm), ind = !sw && IND.test(nm), dji = /DJI/i.test(nm) || !/Jackery|잭커리|CubePilot|큐브|Here4|풀리맥스|Fullymax|스카이킥|Skykick|Hexsoon|MicaSense|미카센스|Gremsy|CZI/i.test(nm);
+    var mk = [].filter.call(document.querySelectorAll('.item_detail_list dt, .js_goods_detail_infotext dt'), function (t) { return /^제조(사)?$/.test(txt(t)); })[0];
+    var mkv = mk && mk.nextElementSibling ? txt(mk.nextElementSibling) : '';
+    var sw = SW.test(nm), ind = !sw && IND.test(nm), dji = mkv ? /DJI/i.test(mkv) && !/Gremsy|PIXY|G-PORT|MicaSense|미카센스|CZI|CubePilot|Here4|Jackery|잭커리/i.test(nm) : /DJI/i.test(nm);   // 제조사 줄이 있으면 그 글자로, 없으면 상품 이름으로
     var mm = (document.body.textContent || '').replace(/\s+/g, ' ').match(/적립 마일리지\s*:?\s*\+?\s*([\d,]+)\s*원/), amt = mm ? (+mm[1].replace(/,/g, '')).toLocaleString('ko-KR') : '', pct = amt && price ? Math.round(+amt.replace(/,/g, '') * 100 / price) : 0;
     function ic(d) { return '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; }
     var I = {
@@ -501,7 +503,7 @@
   // 2026-11-19 I: PC 상세 정보 줄(제조사·구매서류·기술지원·방문 납품·고객상담)을 연회색 카드 2칸으로 (사장님 "제조사부터 너무 없어 보인다" → 시안 OK)
   //   + 추가상품 이름 칸은 단어 단위 줄바꿈('O4 그라운드 스테/이션'처럼 끊기던 것).
   //   원래 줄은 숨기기만 함(자료 그대로) — 빼면 원래대로.
-  var INF_KEYS = { '제조사': '제조사', '구매서류': '구매서류', '기술지원': '기술지원', '구매시 방문 납품': '방문 납품', '고객상담': '고객상담', '고객센터': '고객상담' };
+  var INF_KEYS = { '제조사': '제조사', '제조': '제조사', '구매서류': '구매서류', '기술지원': '기술지원', '구매시 방문 납품': '방문 납품', '고객상담': '고객상담', '고객센터': '고객상담' };
   function infoCard() {
     if (mob || path.indexOf('goods_view') < 0) return;
     var L = document.querySelector('.item_detail_list'); if (!L) return;
@@ -521,7 +523,7 @@
     var fold = L.querySelector('[data-bdc="fold"]');
     var priceRow = [].filter.call(L.children, function (dl) { var t = dl.tagName === 'DL' && dl.querySelector('dt'); return t && txt(t) === '판매가'; })[0];
     if (fold && priceRow && priceRow.nextElementSibling !== fold) L.insertBefore(fold, priceRow.nextSibling);
-    [].forEach.call(L.children, function (dl) { var t = dl.tagName === 'DL' && dl.querySelector('dt'); if (t && /^(모델명|구매혜택|배송비)$/.test(txt(t))) dl.classList.add('dbh-hid'); });   // 11-19 '모델명' 줄 숨김(빛드론과 같게) + 구매혜택·배송비는 아이콘 칸(적립·무료배송/방문납품)과 겹쳐 숨김(사장님)
+    [].forEach.call(L.children, function (dl) { var t = dl.tagName === 'DL' && dl.querySelector('dt'); if (t && /^(모델명|구매혜택|배송비|네이버페이)$/.test(txt(t))) dl.classList.add('dbh-hid'); });   // 11-19 '모델명' 줄 숨김(빛드론과 같게) + 구매혜택·배송비는 아이콘 칸(적립·무료배송/방문납품)과 겹쳐 숨김(사장님)
     var rows = [].filter.call(L.children, function (dl) {
       var t = dl.tagName === 'DL' && dl.querySelector('dt');
       return t && INF_KEYS[txt(t)] && !dl.classList.contains('dbh-hid') && (dl.classList.contains('dbh-inr') || getComputedStyle(dl).display !== 'none');
