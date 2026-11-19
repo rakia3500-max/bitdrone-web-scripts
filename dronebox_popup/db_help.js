@@ -13,6 +13,8 @@
    R2(11-18): 로그인 화면 경로 줄의 깨진 글자 '/data/coupon_image/login-coupo' → '로그인'
    A(11-18): PC 장바구니에 산업용 상품이 있으면 '이 구성으로 견적서 출력 / 전화 상담' 안내 줄 (M5T·M5TD 장바구니 이탈 3건, 사장님 시안 A 승인)
    A2(11-19): 산업용 상품 화면 — PC 추가상품 칸 바로 아래 '고른 구성으로 견적 받기 [카톡][전화]', 휴대폰은 아래 구매 띠 안내 줄을 견적 안내로 (M5T 1572 추가상품만 고르다 나간 3명)
+   N(11-19): 드론박스 전화번호를 0507-1337-7089 하나로 (사장님 "메일 support@bit-drone.com · 전화 0507-1337-7089 이 두 개로")
+      화면 글자·tel: 링크의 070-7811-4422 → 0507-1337-7089. 상품 자료·기본정보 속 옛 번호는 그대로라 이 스크립트를 빼면 원래대로
    M(11-19): 휴대폰 메인 큰 배너의 점 띠(넓이 전체·높이 18px)가 '확인하러가기' 글자를 덮어 누르면 반응 없던 것 → 점만 눌리게
    G(11-18): 상세 구성품 이름(에어3S 콤보 'DJI 숄더 백')을 누르면 구성품 사진이 뜨게 (1555 녹화, 6번 연속 클릭)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
@@ -274,7 +276,7 @@
 
   // 2026-11-18 A: PC 장바구니 — 산업용 상품이 담겨 있으면 견적·상담 안내 줄 (원래 '견적서 출력' 단추 기능을 그대로 부름)
   var IND = /매트리스|Matrice|독\s?[234]|Dock\s?[234]|엔터프라이즈|Enterprise|젠뮤즈|Zenmuse|D-RTK|플라이카트|FlyCart|플라이트허브|FlightHub|테라|Terra|모디파이|Modify|Pix4D|미카센스|MicaSense|그렘시|Gremsy|산업용/i;
-  var IND_TEL = '070-7811-4422';                                  // 산업용 상품 화면·견적서에 적힌 번호와 같게
+  var IND_TEL = '0507-1337-7089';                                 // 11-19 사장님: 드론박스 번호는 0507-1337-7089 하나로
   function quoteCart() {
     if (mob || path.indexOf('/order/cart') < 0 || document.querySelector('.dbh-qc')) return;
     var names = [].map.call(document.querySelectorAll('#frmCart a[href*="goods_view.php?goodsNo="], form a[href*="goods_view.php?goodsNo="]'), txt).join(' ');
@@ -357,8 +359,25 @@
   }
   function partPicsLater() { partPics(); setTimeout(partPics, 1500); setTimeout(partPics, 4000); }   // 상세 본문이 늦게 그려질 때
 
+  // 2026-11-19 N: 화면에 보이는 옛 번호(070-7811-4422)를 0507-1337-7089로 — 글자와 tel: 링크만, 몇 번 나눠서(패널·추가항목이 늦게 그려짐)
+  var OLD_TEL = /0?70[\s.\-]?7811[\s.\-]?4422/g, NEW_TEL = '0507-1337-7089';
+  function telUnify() {
+    var b = document.body; if (!b) return;
+    var w = document.createTreeWalker(b, NodeFilter.SHOW_TEXT), n, hit = [];
+    while ((n = w.nextNode())) {
+      if (n.parentElement && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentElement.tagName)) continue;
+      OLD_TEL.lastIndex = 0; if (OLD_TEL.test(n.nodeValue)) hit.push(n);
+    }
+    hit.forEach(function (x) { x.nodeValue = x.nodeValue.replace(OLD_TEL, NEW_TEL); });
+    [].forEach.call(document.querySelectorAll('a[href^="tel:"]'), function (a) {
+      var h = a.getAttribute('href'); if (/7811[\s.\-]?4422/.test(h)) a.setAttribute('href', 'tel:' + NEW_TEL);
+    });
+  }
+  function telUnifyLater() { telUnify(); [800, 2000, 4500, 9000].forEach(function (t) { setTimeout(telUnify, t); }); }
+
   function run() {
     css();
+    try { telUnifyLater(); } catch (e) {}
     try { quoteCart(); } catch (e) {}
     try { partPicsLater(); } catch (e) {}
     [qaHelp, crumbFix, couponHelp, crumbLogin, setGuide].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
