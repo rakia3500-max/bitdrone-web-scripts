@@ -20,7 +20,7 @@
    V(11-19): '구매시 방문 납품' 줄 — 빛드론과 같게 판매가 700만 원 이상만 보이고, 미만은 숨김(없는 700만↑ 상품엔 넣음)
    S(11-19): 검색 결과 위 '대표 기체' 띠(검색정렬 시안 B안) + 검색 화면 'BEST n' 숨김(C안)
    K2(11-19): 휴대폰 상품 화면 구매 창이 열려 있는 동안 상담 동그라미 숨김(가격 줄을 가림)
-   I(11-19): PC 상세 정보 줄(제조사~고객상담)을 연회색 카드 2칸으로 + 추가상품 이름 칸 단어 단위 줄바꿈
+   I(11-19): PC 상세 정보 줄(제조사~고객상담)을 연회색 카드 2칸으로 + 추가상품 이름 칸 단어 단위 줄바꿈 + 이름·값 줄 세로 쌓임 방지(값 칸 남은 폭)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
@@ -440,13 +440,20 @@
     var L = document.querySelector('.item_detail_list'); if (!L) return;
     if (!document.getElementById('dbh-inf-css')) {
       var c = document.createElement('style'); c.id = 'dbh-inf-css';
-      c.textContent = '.item_detail_list > dl.dbh-hid{display:none!important}' +
+      // 11-19 사장님 "크롬은 왜 옆이 아니라 한 칸씩 내려와 있지?" — 이름 100 + 오른쪽 여백 10 + 값 400 = 510 = 칸 폭(여유 0px)이라 반올림에 따라 값이 아래로 밀림
+      //   → 값 칸은 남은 폭을 다 쓰게(flow-root: 추가상품 펼침 목록이 잘리지 않음). 380px까지 줄여도 나란히 확인
+      c.textContent = '.item_detail_list > dl > dd,.item_add_option_box dl > dd{float:none!important;width:auto!important;display:flow-root!important}' +
+        '.item_detail_list > dl.dbh-hid{display:none!important}' +
         '.item_add_option_box dt,.item_add_option_box th,.item_add_option_box .tit{word-break:keep-all!important;overflow-wrap:normal!important}' +
         '.dbh-inf{clear:both;float:left;width:100%;box-sizing:border-box;margin:10px 0 6px;padding:12px 14px;background:#F7F9FB;border:1px solid #E5E8EB;border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;text-align:left}' +
         '.dbh-inf div{min-width:0}.dbh-inf b{display:block;font-size:12px;font-weight:500;color:#8B95A1;margin-bottom:2px;line-height:1.4}' +
         '.dbh-inf span{display:block;font-size:13.5px;font-weight:600;color:#333D4B;line-height:1.45;word-break:keep-all}.dbh-inf span a{color:#1C88CB!important;text-decoration:none}';
       (document.head || document.documentElement).appendChild(c);
     }
+    // 11-19 사장님 "구매 혜택이나 배송비는 구성품 보기 박스 아래로" → 구성품 보기 상자를 판매가 줄 바로 아래로
+    var fold = L.querySelector('[data-bdc="fold"]');
+    var priceRow = [].filter.call(L.children, function (dl) { var t = dl.tagName === 'DL' && dl.querySelector('dt'); return t && txt(t) === '판매가'; })[0];
+    if (fold && priceRow && priceRow.nextElementSibling !== fold) L.insertBefore(fold, priceRow.nextSibling);
     var rows = [].filter.call(L.children, function (dl) {
       var t = dl.tagName === 'DL' && dl.querySelector('dt');
       return t && INF_KEYS[txt(t)] && !dl.classList.contains('dbh-hid') && (dl.classList.contains('dbh-inr') || getComputedStyle(dl).display !== 'none');
