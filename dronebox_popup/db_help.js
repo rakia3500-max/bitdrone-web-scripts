@@ -12,6 +12,8 @@
    C-PC(11-18): PC 로그인 화면이 '바로 구매'로 열렸을 때 '비회원으로 바로 주문하기' 상자를 맨 위로 (11-14·16·17 매빅3E 녹화, 7초 만에 되돌아감)
    R2(11-18): 로그인 화면 경로 줄의 깨진 글자 '/data/coupon_image/login-coupo' → '로그인'
    A(11-18): PC 장바구니에 산업용 상품이 있으면 '이 구성으로 견적서 출력 / 전화 상담' 안내 줄 (M5T·M5TD 장바구니 이탈 3건, 사장님 시안 A 승인)
+   A2(11-19): 산업용 상품 화면 — PC 추가상품 칸 바로 아래 '고른 구성으로 견적 받기 [카톡][전화]', 휴대폰은 아래 구매 띠 안내 줄을 견적 안내로 (M5T 1572 추가상품만 고르다 나간 3명)
+   M(11-19): 휴대폰 메인 큰 배너의 점 띠(넓이 전체·높이 18px)가 '확인하러가기' 글자를 덮어 누르면 반응 없던 것 → 점만 눌리게
    G(11-18): 상세 구성품 이름(에어3S 콤보 'DJI 숄더 백')을 누르면 구성품 사진이 뜨게 (1555 녹화, 6번 연속 클릭)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
@@ -28,6 +30,8 @@
     var c = document.createElement('style'); c.id = 'dbh-css';
     c.textContent =
       '.secondhand_goods_mobile{display:none!important}img[src*="210831coupon"]{display:none!important}' +
+      // 11-19 M: 슬라이드 점 띠는 점만 눌리고, 나머지 자리는 아래 배너 링크가 받게
+      '.slick-dots{pointer-events:none}.slick-dots li{pointer-events:auto}' +
       // 11-13 S: 추가상품 목록 맨 위 '상품선택'(고를 수 없는 안내 줄)을 눌러 반응 없음 → 펼친 목록에서 숨김 (PC chosen)
       'select[name^="addGoodsInput"]+.chosen-container .chosen-results li[data-option-array-index="0"]{display:none}' +
       'a.kakaoChatPc.dbh-d{width:46px!important;height:46px!important;overflow:hidden!important;right:8px!important;bottom:178px!important;border-radius:50%!important}' +
@@ -292,6 +296,33 @@
     wrap.parentNode.insertBefore(c, wrap);
   }
 
+  // 2026-11-19 A2: 산업용 상품 화면 견적 안내 (상품 이름으로 판정 — IND 정규식은 장바구니 A와 같음)
+  function quoteGoods() {
+    if (path.indexOf('goods_view') < 0 || document.querySelector('.dbh-qg')) return;
+    var nm = document.title + ' ' + txt(document.querySelector('.item_detail_tit, .goods_name, .detail_tit'));
+    if (!IND.test(nm)) return;
+    var bs = 'display:inline-block;padding:9px 14px;font-weight:700;font-size:14px;text-decoration:none;white-space:nowrap;cursor:pointer;';
+    if (!mob) {
+      var add = document.querySelector('.item_add_option_box');
+      if (!add || !add.offsetParent) return;
+      var c = document.createElement('div'); c.className = 'dbh-qg';
+      c.style.cssText = 'clear:both;float:left;width:100%;box-sizing:border-box;margin:10px 0 6px;padding:12px 14px;border:2px solid #1C88CB;background:#F2F8FD;text-align:left';
+      c.innerHTML = '<div style="font-size:14.5px;font-weight:700;color:#191F28">고른 구성 그대로 견적 받기</div>' +
+        '<div style="font-size:12.5px;color:#4E5968;margin:2px 0 10px;line-height:1.5">위에서 고른 배터리·충전 허브·케어 구성으로 견적을 드려요. 장바구니에 담으면 \'견적서 출력\'으로 바로 뽑을 수도 있어요.</div>' +
+        '<a data-q="k" style="' + bs + 'background:#1C88CB;color:#fff!important;margin-right:6px">카톡으로 견적 요청</a>' +
+        '<a href="tel:' + IND_TEL + '" style="' + bs + 'border:1px solid #1C88CB;color:#1C88CB!important;background:#fff">전화 ' + IND_TEL + '</a>';
+      c.querySelector('[data-q="k"]').addEventListener('click', function (e) { e.preventDefault(); kakao(); });
+      add.parentNode.insertBefore(c, add.nextSibling);
+      return;
+    }
+    var n = document.querySelector('.dbh-b');                       // 휴대폰: 구매 띠의 '로그인 없이' 줄을 견적 안내로
+    if (!n) return;
+    n.classList.add('dbh-qg');
+    n.innerHTML = '<b>견적·상담</b> 후 구매하셔도 돼요 · <a data-q="k" style="color:#1C88CB;font-weight:700;text-decoration:underline">카톡 견적</a> · ' +
+      '<a href="tel:' + IND_TEL + '" style="color:#1C88CB;font-weight:700;text-decoration:underline">전화 ' + IND_TEL + '</a><br><span style="color:#6B7684">로그인 없이 바로구매·네이버페이도 돼요</span>';
+    n.querySelector('[data-q="k"]').addEventListener('click', function (e) { e.preventDefault(); kakao(); });
+  }
+
   // 2026-11-18 G: 구성품 이름 → 사진 — 상품 번호: [[구성품 글자, 사진 주소(이미 올린 상품 사진), 설명], …]
   var IMG = 'https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/';
   var A3S_RC2 = IMG + '1000001246/image/detail/1000001236_detail_611.jpg', A3S_N3 = IMG + '1000001241/image/detail/1000001241_detail_786.jpg';
@@ -332,8 +363,9 @@
     try { partPicsLater(); } catch (e) {}
     [qaHelp, crumbFix, couponHelp, crumbLogin, setGuide].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
     if (!mob) { try { guestUpPc(); } catch (e) {} }
+    if (!mob) { try { quoteGoods(); } catch (e) {} }
     if (!mob) return;                         // B·C·D·E는 휴대폰 화면만 (X는 CSS로 PC도)
-    [smallChat, buyNote, guestUp, freeShip].forEach(function (f) { try { f(); } catch (e) {} });
+    [smallChat, buyNote, guestUp, freeShip, quoteGoods].forEach(function (f) { try { f(); } catch (e) {} });   // quoteGoods는 buyNote 뒤(그 줄을 바꿈)
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
 })();
