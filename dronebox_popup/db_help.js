@@ -19,6 +19,7 @@
    G(11-18): 상세 구성품 이름(에어3S 콤보 'DJI 숄더 백')을 누르면 구성품 사진이 뜨게 (1555 녹화, 6번 연속 클릭)
    V(11-19): '구매시 방문 납품' 줄 — 빛드론과 같게 판매가 700만 원 이상만 보이고, 미만은 숨김(없는 700만↑ 상품엔 넣음)
    S(11-19): 검색 결과 위 '대표 기체' 띠(검색정렬 시안 B안) + 검색 화면 'BEST n' 숨김(C안)
+   K2(11-19): 휴대폰 상품 화면 구매 창이 열려 있는 동안 상담 동그라미 숨김(가격 줄을 가림)
    I(11-19): PC 상세 정보 줄(제조사~고객상담)을 연회색 카드 2칸으로 + 추가상품 이름 칸 단어 단위 줄바꿈
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
@@ -53,6 +54,14 @@
   function smallChat() {
     if (!/goods_view|\/order\/|\/member\/login/.test(path)) return;
     var k = document.querySelector('a.kakaoChatPc'); if (k) k.classList.add('dbh-d');
+    // 11-19 사장님 "모바일에서 상담 아이콘이 아래쪽에 있으니 거슬린다" → 상품 화면 구매 창(수량·추가상품)이 열려 있는 동안만 숨김
+    if (k && path.indexOf('goods_view') >= 0 && !window.__dbhKk) {
+      window.__dbhKk = 1;
+      setInterval(function () {
+        var inf = document.querySelector('.ly_buy_info'), open = !!(inf && inf.offsetHeight > 0);
+        k.style.visibility = open ? 'hidden' : ''; k.style.pointerEvents = open ? 'none' : '';
+      }, 400);
+    }
   }
 
   // B: 상세 구매 칸(펼침 칸) 단추 위
