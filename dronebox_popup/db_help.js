@@ -17,6 +17,8 @@
       화면 글자·tel: 링크의 070-7811-4422 → 0507-1337-7089. 상품 자료·기본정보 속 옛 번호는 그대로라 이 스크립트를 빼면 원래대로
    M(11-19): 휴대폰 메인 큰 배너의 점 띠(넓이 전체·높이 18px)가 '확인하러가기' 글자를 덮어 누르면 반응 없던 것 → 점만 눌리게
    G(11-18): 상세 구성품 이름(에어3S 콤보 'DJI 숄더 백')을 누르면 구성품 사진이 뜨게 (1555 녹화, 6번 연속 클릭)
+   V(11-19): '구매시 방문 납품' 줄 — 빛드론과 같게 판매가 700만 원 이상만 보이고, 미만은 숨김(없는 700만↑ 상품엔 넣음)
+   S(11-19): 검색 결과 위 '대표 기체' 띠(검색정렬 시안 B안) + 검색 화면 'BEST n' 숨김(C안)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
@@ -375,9 +377,94 @@
   }
   function telUnifyLater() { telUnify(); [800, 2000, 4500, 9000].forEach(function (t) { setTimeout(telUnify, t); }); }
 
+  // 2026-11-19 V: '구매시 방문 납품' 줄을 빛드론과 같은 기준으로 (사장님 "무료배송과 방문 납품 기준은 드론박스도 동일하게")
+  //   판매가 700만 원 이상 = 줄 보임(없으면 기술지원·배송비 줄 아래에 넣음) · 700만 원 미만 = 숨김(무료배송은 배송비 줄에 이미 있음)
+  //   가격을 모르는 상품(1,000원 미만)은 그대로. 상품 자료(추가항목)는 그대로라 이 스크립트를 빼면 원래대로.
+  var VISIT_MIN = 7000000;
+  function visitRule() {
+    if (path.indexOf('goods_view') < 0) return;
+    var pi = document.querySelector('input[name="set_goods_price"]');
+    var p = pi ? +String(pi.value).replace(/[^0-9.]/g, '') : 0;
+    if (!p || p < 1000) return;
+    var dts = [].filter.call(document.querySelectorAll('dt'), function (t) { return /방문\s*납품/.test(txt(t)); });
+    if (p < VISIT_MIN) {
+      dts.forEach(function (t) {
+        var dl = t.parentElement;
+        if (dl && dl.tagName === 'DL' && dl.querySelectorAll('dt').length === 1) { dl.style.display = 'none'; return; }
+        t.style.display = 'none';
+        var dd = t.nextElementSibling; if (dd && dd.tagName === 'DD') dd.style.display = 'none';
+      });
+      return;
+    }
+    if (dts.length) return;
+    var boxes = [];
+    [].forEach.call(document.querySelectorAll('.item_detail_list dt, .js_goods_detail_infotext dt'), function (t) {
+      if (!/^(기술지원|배송비)$/.test(txt(t))) return;
+      var dl = t.parentElement; if (!dl || dl.tagName !== 'DL') return;
+      var multi = dl.querySelectorAll('dt').length > 1, box = multi ? dl : dl.parentElement;
+      if (boxes.indexOf(box) >= 0) return;
+      boxes.push(box);
+      var all = multi ? [].slice.call(dl.querySelectorAll('dt')) : [].map.call(box.children, function (x) { return x.querySelector && x.querySelector('dt'); }).filter(Boolean);
+      var a = all.filter(function (x) { return txt(x) === '기술지원'; })[0] || all.filter(function (x) { return txt(x) === '배송비'; })[0];
+      if (!a) return;
+      if (multi) {
+        var dd = a.nextElementSibling; while (dd && dd.tagName !== 'DD') dd = dd.nextElementSibling;
+        var ref = dd || a, nt = document.createElement('dt'), nd = document.createElement('dd');
+        nt.textContent = '구매시 방문 납품'; nd.textContent = '초기세팅 및 사용법 교육'; nt.setAttribute('data-dbv', '1');
+        ref.parentNode.insertBefore(nd, ref.nextSibling); ref.parentNode.insertBefore(nt, nd);
+      } else {
+        var row = a.parentElement, nl = document.createElement('dl');
+        nl.setAttribute('data-dbv', '1'); nl.innerHTML = '<dt>구매시 방문 납품</dt><dd>초기세팅 및 사용법 교육</dd>';
+        row.parentNode.insertBefore(nl, row.nextSibling);
+      }
+    });
+  }
+  function visitLater() { visitRule(); [1500, 4000].forEach(function (t) { setTimeout(visitRule, t); }); }   // 상세 정보 줄 스크립트(data-bdinfo)가 늦게 그림
+
+  // 2026-11-19 S: 검색 결과 위 '대표 기체' 띠 (사장님 승인 — 검색정렬 시안 B안). 검색이 최신 등록순이라 '매트리스' 첫 화면이 액세서리뿐이던 것
+  //   목록·정렬은 그대로, 액세서리 낱말이 같이 있으면 안 띄움, 0건 화면에도 띄움. 자료는 08_쇼핑몰/검색정렬_시안_2026-11-19/build_strip.py 가 아래 표시 사이만 씀.
+  //   + C안: 검색 화면의 'BEST 1·2·3' 표시 숨김(판매 순위가 아니라 최신순 자리 번호였음 — 분류·메인 BEST는 그대로)
+  /*STRIP-DATA*/
+  var SS_RULES = [["매트리스5|m5t|m5td|matrice5",[[1572,"매트리스 5T","열화상·야간 점검","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261109/56952ce839b8eb1b7c3ae0cbd06660e1.jpg"],[1566,"매트리스 5TD 콤보","독4용 열화상","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261026/996fbec38d665ad24ad63df2fb3c8f71.jpg"],[1567,"5TD 낙하산 콤보","독4용 · AP1 낙하산","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261026/ba1fee1e8f88d2db2e22622f90687a8b.jpg"]]],["매트리스400|m400|matrice400",[[1318,"매트리스 400 Plus 콤보","대형 플랫폼 · 59분 비행","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001318/image/list/1000001318_list_019.jpg"]]],["매트리스4|m4t|m4e|m4td|m4d|matrice4",[[1271,"매트리스 4T","열화상·수색","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001271/image/list/1000001271_list_011.jpg"],[1270,"매트리스 4E","측량·매핑","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001270/image/list/1000001270_list_081.jpg"],[1637,"4TD SP Plus+","독3용 열화상 · RC Plus 2","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261117/dc96d62ea38a479f13cff828171f692d.jpg"],[1295,"4TD SP PLUS","독3용 열화상","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001295/image/list/1000001295_list_058.jpg"],[1294,"4D SP PLUS","독3용 측량","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001294/image/list/1000001294_list_096.jpg"]]],["독|dock|도크|드론스테이션",[[1565,"독4","무인 자동 운용 스테이션","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261026/9ccfe5bae67cf01ff4cf03d75620a0f5.jpg"],[1293,"독3","무인 자동 운용 스테이션","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001293/image/list/1000001293_list_071.jpg"],[1409,"독3 + 4TD","무인 자동 운용 세트","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001409/image/list/1000001409_list_013.jpg"]]],["매빅3엔터|매빅3e|매빅3t|매빅3멀티|mavic3e|mavic3t|mavic3m|mavic3enterprise|멀티스펙트럴|3ta",[[1588,"매빅3 엔터프라이즈 3E","소형 측량","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/product/big/20240329/85a4c4d12f3a6422321e7c5fc7c298bf.jpg"],[1589,"매빅3 3TA","소형 열화상","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/product/big/20240329/7f4479ffcc6609ea86420236fa421fd8.jpg"],[881,"매빅3 멀티스펙트럴","농업·식생 분석","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000000881/image/list/1000000881_list_032.jpg"]]],["열화상|써멀|thermal",[[1572,"매트리스 5T","열화상·야간 점검","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261109/56952ce839b8eb1b7c3ae0cbd06660e1.jpg"],[1271,"매트리스 4T","열화상·수색","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001271/image/list/1000001271_list_011.jpg"],[1637,"4TD SP Plus+","독3용 열화상 · RC Plus 2","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261117/dc96d62ea38a479f13cff828171f692d.jpg"],[1295,"4TD SP PLUS","독3용 열화상","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001295/image/list/1000001295_list_058.jpg"],[1589,"매빅3 3TA","소형 열화상","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/product/big/20240329/7f4479ffcc6609ea86420236fa421fd8.jpg"]]],["매트리스|matrice|산업용|엔터프라이즈|enterprise",[[1572,"매트리스 5T","열화상·야간 점검","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261109/56952ce839b8eb1b7c3ae0cbd06660e1.jpg"],[1566,"매트리스 5TD 콤보","독4용 열화상","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261026/996fbec38d665ad24ad63df2fb3c8f71.jpg"],[1271,"매트리스 4T","열화상·수색","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001271/image/list/1000001271_list_011.jpg"],[1270,"매트리스 4E","측량·매핑","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001270/image/list/1000001270_list_081.jpg"],[1637,"4TD SP Plus+","독3용 열화상 · RC Plus 2","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261117/dc96d62ea38a479f13cff828171f692d.jpg"],[1318,"매트리스 400 Plus 콤보","대형 플랫폼 · 59분 비행","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001318/image/list/1000001318_list_019.jpg"],[1565,"독4","무인 자동 운용 스테이션","https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/upload/NNEditor/20261026/9ccfe5bae67cf01ff4cf03d75620a0f5.jpg"],[1293,"독3","무인 자동 운용 스테이션","https://godomall.speedycdn.net/2ee3015e331087a0acf29befbeb79f2d/goods/1000001293/image/list/1000001293_list_071.jpg"]]]];
+  var SS_SKIP = '배터리|프로펠러|케어|care|충전|허브|케이스|스피커|조명|스포트라이트|낙하산|동글|마운트|가드|필터|키트|젠뮤즈|zenmuse|h30|어댑터|스트랩|랜딩|부품|모듈|가방|거치|커버|조종기|rcplus|라이선스|소프트웨어|보험|수리|중고|교육';
+  /*/STRIP-DATA*/
+  function searchStrip() {
+    if (path.indexOf('goods_search') < 0) return;
+    if (!document.getElementById('dbh-ss-css')) {
+      var c = document.createElement('style'); c.id = 'dbh-ss-css';
+      c.textContent = '.pr_best{display:none!important}' +
+        '.dbh-ss{clear:both;margin:14px 0 18px;padding:14px 16px 12px;border:1px solid #1C88CB;background:#fff;text-align:left;box-sizing:border-box}' +
+        '.dbh-ss h3{margin:0 0 10px;font-size:16px;font-weight:700;color:#156FAB;line-height:1.3}.dbh-ss h3 small{font-size:12.5px;font-weight:400;color:#6B7684;margin-left:8px}' +
+        '.dbh-ss .r{display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}' +
+        '.dbh-ss a{flex:0 0 150px;display:block;border:1px solid #E5E8EB;padding:8px;text-decoration:none;color:#191F28!important;background:#fff;box-sizing:border-box}' +
+        '.dbh-ss a:hover{border-color:#1C88CB}.dbh-ss img{display:block;width:100%;height:120px;object-fit:contain;background:#F7F8FA;margin-bottom:6px}' +
+        '.dbh-ss b{display:block;font-size:13.5px;line-height:1.35}.dbh-ss span{display:block;font-size:12px;color:#1C88CB;margin-top:2px}' +
+        '.dbh-ss.mo{margin:10px 12px 14px;padding:12px 12px 10px}.dbh-ss.mo a{flex-basis:128px}.dbh-ss.mo img{height:96px}';
+      (document.head || document.documentElement).appendChild(c);
+    }
+    if (document.querySelector('.dbh-ss')) return;
+    var m = location.search.match(/[?&]keyword=([^&]*)/); if (!m) return;
+    var k = ''; try { k = decodeURIComponent(m[1].replace(/\+/g, ' ')); } catch (e) { return; }
+    k = k.toLowerCase().replace(/\s+/g, '');
+    if (!k || new RegExp(SS_SKIP).test(k)) return;
+    var r = SS_RULES.filter(function (x) { return new RegExp(x[0]).test(k); })[0];
+    if (!r) return;
+    var at = mob ? document.getElementById('goodslist') : ((document.querySelector('.goods_list_cont') || {}).parentNode || (document.querySelector('.goods_no_data') || {}).parentNode);
+    if (!at || !at.parentNode) return;
+    var box = document.createElement('div'); box.className = 'dbh-ss' + (mob ? ' mo' : '');
+    var h = '<h3>대표 기체<small>검색어에 맞는 기체를 먼저 보여 드려요</small></h3><div class="r">';
+    r[1].forEach(function (x) {
+      h += '<a href="/goods/goods_view.php?goodsNo=' + (1000000000 + x[0]) + '"><img src="' + x[3] + '" alt="' + x[1] + '" loading="lazy"><b>' + x[1] + '</b><span>' + x[2] + '</span></a>';
+    });
+    box.innerHTML = h + '</div>';
+    at.parentNode.insertBefore(box, at);
+  }
+
   function run() {
     css();
     try { telUnifyLater(); } catch (e) {}
+    try { visitLater(); } catch (e) {}
+    try { searchStrip(); setTimeout(searchStrip, 1500); } catch (e) {}
     try { quoteCart(); } catch (e) {}
     try { partPicsLater(); } catch (e) {}
     [qaHelp, crumbFix, couponHelp, crumbLogin, setGuide].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
