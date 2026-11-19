@@ -58,7 +58,11 @@
     507:['DJI 플라이카트 30','20241209/e05abd1178a8d5447640c2ccdfbb823b.jpg'],
     565:['DJI 테라 스탠다드 1년','20250724/5f333c62596237a73adb9e47f8e44a65.jpg'],
     568:['DJI 테라 스탠다드 영구판','20250724/933057e335c4f7868ed690db7fdd0bd1.jpg'],
-    672:['PIX4D Matic Analyst','20260506/000782490058d23f9bf93e8aa12825bf.png']
+    672:['PIX4D Matic Analyst','20260506/000782490058d23f9bf93e8aa12825bf.png'],
+    879:['잭커리 파워뱅크 2000 Plus','20261119/22b26d02c96cccbc63783ddb0d7635b1.jpg'],
+    878:['잭커리 파워뱅크 1500 Ultra','20261119/cc0dacc76ba9edee6e55c6de96cec897.jpg'],
+    875:['잭커리 파워뱅크 1000 Plus','20261119/474dce2afae51fb2e577ed2644509f01.jpg'],
+    883:['잭커리 파워뱅크 300 Plus','20261119/3129c16d8e7da9656b296066ecd83dc6.jpg']
   };
   var CATS = [
     {no:24, name:'DJI 매빅', short:'매빅', img:543, subs:[[125,'DJI 매빅4 프로',543],[46,'DJI 매빅3 프로',0,'MAVIC 3 PRO'],[48,'DJI 매빅3 클래식',0,'MAVIC 3 CLASSIC'],[66,'DJI 매빅2 시리즈',0,'MAVIC 2'],[67,'DJI 매빅1 시리즈',0,'MAVIC']], picks:[543,541,542]},
@@ -71,7 +75,8 @@
     {no:27, name:'DJI 핸드헬드', short:'핸드헬드', img:339, subs:[[34,'DJI 오즈모포켓',795],[164,'DJI 오즈모 액션',637],[88,'DJI 오즈모 나노',622],[54,'DJI Mic',755],[56,'DJI 오즈모 모바일',628],[130,'DJI 오즈모 360',0,'OSMO 360']], picks:[795,637,622,755]},
     {no:42, name:'DJI 로닌', short:'로닌', img:646, subs:[[80,'DJI RS 4 PRO',0,'RS 4 PRO'],[105,'DJI RS 4',0,'RS 4'],[121,'DJI RS 4 MINI',533],[57,'RS 3 PRO',0,'RS 3 PRO'],[58,'RS 3',0,'RS 3'],[59,'RS 3 MINI',0,'RS 3 MINI'],[166,'DJI RS 5',647]], picks:[646,647,533]},
     {no:43, name:'DJI 산업용드론', short:'산업용 드론', img:804, subs:[[170,'DJI 매트리스 5 시리즈',804],[117,'DJI 매트리스 4 시리즈',514],[122,'드론 스테이션',534],[129,'DJI 매트리스 400 RTK',550],[60,'DJI 매빅3 엔터프라이즈',309],[61,'DJI 매트리스 350 RTK',0,'M350 RTK'],[62,'DJI 매트리스 30 시리즈',0,'M30'],[74,'페이로드',413],[112,'운송용 드론',0,'FLYCART 30'],[82,'인스파이어3',0,'INSPIRE 3']], picks:[804,514,550,534]},
-    {no:92, name:'S/W', short:'소프트웨어', img:565, subs:[[94,'DJI S/W',565],[95,'PIX4D',672]], picks:[565,568,672]}
+    {no:92, name:'S/W', short:'소프트웨어', img:565, subs:[[94,'DJI S/W',565],[95,'PIX4D',672]], picks:[565,568,672]},
+    {no:171, name:'파워뱅크', short:'파워뱅크', img:879, subs:[], picks:[879,878,875,883]}
   ];
   var SUPPORT = {name:'고객지원', href:'/board/free/list.html?board_no=1', subs:[['수리접수','/board/%EC%88%98%EB%A6%AC%EC%A0%91%EC%88%98/1/'],['공공기관 구매안내','/board/%EA%B3%B5%EA%B3%B5%EA%B8%B0%EA%B4%80-%EA%B5%AC%EB%A7%A4%EC%95%88%EB%82%B4/2/'],['리뷰','/board/%EB%A6%AC%EB%B7%B0/4/'],['공지사항','/board/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/5/']]};
   function CAT(no) { for (var i = 0; i < CATS.length; i++) if (CATS[i].no === no) return CATS[i]; }
