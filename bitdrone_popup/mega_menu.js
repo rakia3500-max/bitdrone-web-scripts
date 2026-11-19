@@ -112,7 +112,10 @@
     '#bdMega .bm-foot-in{display:flex;gap:24px;padding:13px 40px;max-width:1400px;margin:0 auto;font-size:13.5px;color:#6B7280}',
     '#bdMega .bm-foot a:hover{color:#2F7DF6}',
     '#bdMega .bm-foot b{color:#3A3F47;font-weight:600;margin-right:4px}',
-    '#mh_nav_box .bm-open > a{color:#2F7DF6 !important;box-shadow:inset 0 -2px 0 #F39800}'
+    '#mh_nav_box .bm-open > a{color:#2F7DF6 !important;box-shadow:inset 0 -2px 0 #F39800}',
+    /* 11-19 파워뱅크 추가로 메뉴가 13칸 → 좁은 PC 화면에서 고객지원이 유튜브 단추와 겹침: 간격 줄이고, 더 좁으면 유튜브 단추 숨김 */
+    '@media (max-width:1535px){#mh_nav_box .mh_category > ul > li > a{padding:0 6px !important}}',
+    '@media (max-width:1365px){#mh_nav_box .mh_youtube{display:none !important}}'
   ].join('\n');
 
   function hoverCtl(openFn, closeFn) {
