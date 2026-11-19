@@ -447,7 +447,7 @@
     rows.forEach(function (dl) {
       var k = INF_KEYS[txt(dl.querySelector('dt'))], v = txt(dl.querySelector('dd'));
       if (seen[k]) return; seen[k] = 1;
-      if (k === '제조사') v = 'DJI 정품 (공식 수입상품)';
+      if (k === '제조사' && /DJI/.test(v)) v = 'DJI 정품 (공식 수입상품)';   // DJI가 아닌 상품(잭커리 등)은 원래 글자 그대로
       if (k === '고객상담') v = '<a href="tel:' + TEL + '">' + TEL + '</a>';
       h += '<div><b>' + k + '</b><span>' + v + '</span></div>';
     });
