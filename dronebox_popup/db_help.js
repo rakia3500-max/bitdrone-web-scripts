@@ -19,6 +19,7 @@
    G(11-18): 상세 구성품 이름(에어3S 콤보 'DJI 숄더 백')을 누르면 구성품 사진이 뜨게 (1555 녹화, 6번 연속 클릭)
    V(11-19): '구매시 방문 납품' 줄 — 빛드론과 같게 판매가 700만 원 이상만 보이고, 미만은 숨김(없는 700만↑ 상품엔 넣음)
    S(11-19): 검색 결과 위 '대표 기체' 띠(검색정렬 시안 B안) + 검색 화면 'BEST n' 숨김(C안)
+   I(11-19): PC 상세 정보 줄(제조사~고객상담)을 연회색 카드 2칸으로 + 추가상품 이름 칸 단어 단위 줄바꿈
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
@@ -390,7 +391,7 @@
     if (p < VISIT_MIN) {
       dts.forEach(function (t) {
         var dl = t.parentElement;
-        if (dl && dl.tagName === 'DL' && dl.querySelectorAll('dt').length === 1) { dl.style.display = 'none'; return; }
+        if (dl && dl.tagName === 'DL' && dl.querySelectorAll('dt').length === 1) { dl.classList.add('dbh-hid'); dl.style.display = 'none'; return; }
         t.style.display = 'none';
         var dd = t.nextElementSibling; if (dd && dd.tagName === 'DD') dd.style.display = 'none';
       });
@@ -419,7 +420,43 @@
       }
     });
   }
-  function visitLater() { visitRule(); [1500, 4000].forEach(function (t) { setTimeout(visitRule, t); }); }   // 상세 정보 줄 스크립트(data-bdinfo)가 늦게 그림
+  function visitLater() { visitRule(); infoCard(); [1500, 4000].forEach(function (t) { setTimeout(function () { visitRule(); infoCard(); }, t); }); }   // 상세 정보 줄 스크립트(data-bdinfo)가 늦게 그림
+
+  // 2026-11-19 I: PC 상세 정보 줄(제조사·구매서류·기술지원·방문 납품·고객상담)을 연회색 카드 2칸으로 (사장님 "제조사부터 너무 없어 보인다" → 시안 OK)
+  //   + 추가상품 이름 칸은 단어 단위 줄바꿈('O4 그라운드 스테/이션'처럼 끊기던 것).
+  //   원래 줄은 숨기기만 함(자료 그대로) — 빼면 원래대로.
+  var INF_KEYS = { '제조사': '제조사', '구매서류': '구매서류', '기술지원': '기술지원', '구매시 방문 납품': '방문 납품', '고객상담': '고객상담', '고객센터': '고객상담' };
+  function infoCard() {
+    if (mob || path.indexOf('goods_view') < 0) return;
+    var L = document.querySelector('.item_detail_list'); if (!L) return;
+    if (!document.getElementById('dbh-inf-css')) {
+      var c = document.createElement('style'); c.id = 'dbh-inf-css';
+      c.textContent = '.item_detail_list > dl.dbh-hid{display:none!important}' +
+        '.item_add_option_box dt,.item_add_option_box th,.item_add_option_box .tit{word-break:keep-all!important;overflow-wrap:normal!important}' +
+        '.dbh-inf{clear:both;float:left;width:100%;box-sizing:border-box;margin:10px 0 6px;padding:12px 14px;background:#F7F9FB;border:1px solid #E5E8EB;border-radius:8px;display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;text-align:left}' +
+        '.dbh-inf div{min-width:0}.dbh-inf b{display:block;font-size:12px;font-weight:500;color:#8B95A1;margin-bottom:2px;line-height:1.4}' +
+        '.dbh-inf span{display:block;font-size:13.5px;font-weight:600;color:#333D4B;line-height:1.45;word-break:keep-all}.dbh-inf span a{color:#1C88CB!important;text-decoration:none}';
+      (document.head || document.documentElement).appendChild(c);
+    }
+    var rows = [].filter.call(L.children, function (dl) {
+      var t = dl.tagName === 'DL' && dl.querySelector('dt');
+      return t && INF_KEYS[txt(t)] && !dl.classList.contains('dbh-hid') && (dl.classList.contains('dbh-inr') || getComputedStyle(dl).display !== 'none');
+    });
+    if (!rows.length) return;
+    var seen = {}, h = '';
+    rows.forEach(function (dl) {
+      var k = INF_KEYS[txt(dl.querySelector('dt'))], v = txt(dl.querySelector('dd'));
+      if (seen[k]) return; seen[k] = 1;
+      if (k === '제조사') v = 'DJI 정품 (공식 수입상품)';
+      if (k === '고객상담') v = '<a href="tel:' + TEL + '">' + TEL + '</a>';
+      h += '<div><b>' + k + '</b><span>' + v + '</span></div>';
+    });
+    var box = L.querySelector('.dbh-inf');
+    if (!box) { box = document.createElement('div'); box.className = 'dbh-inf'; }
+    if (box.innerHTML !== h) box.innerHTML = h;
+    if (box.nextSibling !== rows[0]) L.insertBefore(box, rows[0]);
+    rows.forEach(function (dl) { dl.classList.add('dbh-inr'); dl.style.display = 'none'; });
+  }
 
   // 2026-11-19 S: 검색 결과 위 '대표 기체' 띠 (사장님 승인 — 검색정렬 시안 B안). 검색이 최신 등록순이라 '매트리스' 첫 화면이 액세서리뿐이던 것
   //   목록·정렬은 그대로, 액세서리 낱말이 같이 있으면 안 띄움, 0건 화면에도 띄움. 자료는 08_쇼핑몰/검색정렬_시안_2026-11-19/build_strip.py 가 아래 표시 사이만 씀.
