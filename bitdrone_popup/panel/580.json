@@ -1,0 +1,1 @@
+{"intro": "DJI 드론으로 찍은 사진·LiDAR 데이터를 2D 지도와 3D 모델로 만드는 매핑 소프트웨어 DJI Terra. Cluster 버전에 처리용 PC(노드) 1대를 더하는 패키지.", "chips": ["2D 지도 · 3D 모델 재구성", "DJI 드론 데이터 연동", "Cluster 노드 추가", "노드 1개"], "box": [], "ship": ""}
