@@ -1,0 +1,1 @@
+{"intro": "드론에 센티미터급 위치 보정을 주는 다기능 스테이션. 베이스·릴레이·로버 3가지 모드, 로버 정확도 수평 0.8cm+1ppm, IP67.", "chips": ["베이스 · 릴레이 · 로버 3모드", "로버 수평 0.8cm+1ppm", "로버 수직 1.5cm+1ppm", "GPS · BDS · Galileo · GLONASS · QZSS", "IP67", "1.26kg", "Matrice · Agras 호환"], "box": ["D-RTK 3 다기능 스테이션", "예비 OcuSync 지향성 안테나 ×4", "USB-A to USB-C 케이블"], "ship": ""}

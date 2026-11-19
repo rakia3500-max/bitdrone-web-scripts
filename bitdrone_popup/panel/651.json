@@ -1,0 +1,1 @@
+{"intro": "H7 프로세서와 3중 IMU를 넣은 드론용 비행제어장치(FC) Cube Orange+. ArduPilot·PX4 펌웨어를 지원하는 스탠다드 세트.", "chips": ["H7 프로세서", "3중 중복 IMU", "방진 · 온도 제어 히터", "ArduPilot · PX4", "캐리어 보드 호환", "스탠다드 세트"], "box": [], "ship": ""}
