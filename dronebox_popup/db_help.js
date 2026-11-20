@@ -586,8 +586,32 @@
     at.parentNode.insertBefore(box, at);
   }
 
+  // 2026-11-20 P: 추가상품 목록의 금액 '( +1,489,000원 )'이 괄호 뒤에서 끊겨 아랫줄로 넘어감(사장님 캡처, 인스파이어 3) →
+  //   금액을 '(+1,489,000원)' 한 덩어리(줄바꿈 안 함)로 묶음. PC 드롭다운(chosen)·휴대폰 구매 창 목록 모두. 목록은 열 때마다 다시 그려져서 지켜보다가 다시 묶음.
+  var PRICE_RE = /\(\s*([+\-]?\s*[\d,]+\s*원)\s*\)\s*$/;
+  function priceWrap() {
+    [].forEach.call(document.querySelectorAll('.chosen-results li, .ly_buy_info li'), function (li) {
+      if (li.querySelector('.dbh-pr')) return;
+      var nodes = [].filter.call(li.childNodes, function (n) { return n.nodeType === 3 && /원\s*\)\s*$/.test(n.nodeValue); });
+      var t = nodes[nodes.length - 1]; if (!t) return;
+      var m = t.nodeValue.match(PRICE_RE); if (!m) return;
+      var s = document.createElement('span'); s.className = 'dbh-pr'; s.style.whiteSpace = 'nowrap';
+      s.textContent = '(' + m[1].replace(/\s+/g, '') + ')';
+      t.nodeValue = t.nodeValue.slice(0, m.index).replace(/\s*$/, ' ');
+      t.parentNode.insertBefore(s, t.nextSibling);
+    });
+  }
+  function priceWatch() {
+    priceWrap();
+    if (!window.MutationObserver || path.indexOf('goods_view') < 0) return;
+    var busy = 0;
+    new MutationObserver(function () { if (busy) return; busy = 1; setTimeout(function () { busy = 0; try { priceWrap(); } catch (e) {} }, 30); })
+      .observe(document.body, {childList: true, subtree: true});
+  }
+
   function run() {
     css();
+    try { priceWatch(); } catch (e) {}
     try { telUnifyLater(); } catch (e) {}
     try { visitLater(); } catch (e) {}
     try { searchStrip(); setTimeout(searchStrip, 1500); } catch (e) {}
