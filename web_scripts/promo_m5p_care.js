@@ -47,7 +47,7 @@
     '.m5c-c ol>li i{flex:none;width:24px;height:24px;border-radius:50%;background:#1F67B1;color:#fff;font-style:normal;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}' +
     '.m5c-c ol>li b{display:block;font-size:14.5px}.m5c-c ol>li em{font-style:normal;color:#4E5968;font-size:13px}' +
     '.m5c-c .qr{flex:none;width:176px;background:#fff;border-radius:14px;padding:14px;text-align:center;font-size:12.5px;color:#4E5968;line-height:1.45}' +
-    '.m5c-c .qr img{display:block;width:148px;height:148px;margin:0 auto 8px;image-rendering:pixelated}' +
+    '.m5c-c .qr img{display:block;width:148px!important;height:148px!important;max-width:none!important;margin:0 auto 8px;image-rendering:pixelated}' +
     '.m5c-c a.btn{display:block;margin:16px 0 0;padding:15px;border-radius:12px;background:#1F67B1;color:#fff;text-align:center;font-weight:700;font-size:15.5px;text-decoration:none}' +
     '.m5c-c .pc-link{display:inline-block;margin-top:6px;color:#1F67B1;font-weight:700;text-decoration:none}' +
     '.m5c-c .n{margin:16px 0 0;display:block;padding:0;list-style:none;font-size:12.5px;color:#6B7684;line-height:1.7}' +
@@ -55,7 +55,7 @@
     '.m5c-a .n{margin:10px 0 0;font-size:12.5px;color:#6B7684;line-height:1.7;text-align:left}' +
     '.m5c-a a.btn{display:block;margin:12px 0 0;padding:15px;border-radius:12px;background:#1F67B1;color:#fff;font-weight:700;font-size:15.5px;text-decoration:none}' +
     '.m5c-note{display:block;margin:6px 0 0;font-size:12px;color:#1F67B1;line-height:1.45}' +
-    '@media (max-width:768px){.m5c-c{padding:22px 18px 18px;border-radius:14px;margin-bottom:28px}.m5c-c h3{font-size:22px}.m5c-c .row{display:block}.m5c-c .qr{width:auto;display:flex;align-items:center;gap:14px;margin:12px 0 0;text-align:left;font-size:13px}.m5c-c .qr img{width:116px;height:116px;margin:0}.m5c-c .qr .pc-link{display:none}' +
+    '@media (max-width:768px){.m5c-c{padding:22px 18px 18px;border-radius:14px;margin-bottom:28px}.m5c-c h3{font-size:22px}.m5c-c .row{display:block}.m5c-c .qr{width:auto;display:flex;align-items:center;gap:14px;margin:12px 0 0;text-align:left;font-size:13px}.m5c-c .qr img{flex:none;width:116px!important;height:116px!important;margin:0}.m5c-c .qr span{flex:1;min-width:0}.m5c-c .qr .pc-link{display:none}' +
     '.m5c-s{font-size:13px;padding:10px 12px;flex-wrap:wrap}.m5c-s a.go{margin-left:32px}}';
 
   var ICON = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.8l7 2.6v6.1c0 4.3-2.9 8.1-7 9.7-4.1-1.6-7-5.4-7-9.7V5.4l7-2.6z" fill="#fff" stroke="#1F67B1" stroke-width="1.6"/><path d="M15.2 10.4a3.4 3.4 0 0 0-6-1.2M8.8 13.6a3.4 3.4 0 0 0 6 1.2" stroke="#1F67B1" stroke-width="1.6" stroke-linecap="round"/><path d="M9.6 7.8l-.5 1.6 1.6.3M14.4 16.2l.5-1.6-1.6-.3" stroke="#1F67B1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
