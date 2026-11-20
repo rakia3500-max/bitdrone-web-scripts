@@ -327,7 +327,10 @@
         '<a data-q="k" style="' + bs + 'background:#1C88CB;color:#fff!important;margin-right:6px">카톡으로 견적 요청</a>' +
         '<a href="tel:' + IND_TEL + '" style="' + bs + 'border:1px solid #1C88CB;color:#1C88CB!important;background:#fff">전화 ' + IND_TEL + '</a>';
       c.querySelector('[data-q="k"]').addEventListener('click', function (e) { e.preventDefault(); kakao(); });
-      add.parentNode.insertBefore(c, add.nextSibling);
+      // 11-20 사장님 "1572 견적 상자 합계 옆으로": 추가상품을 많이 고르면 합계가 아래로 밀려 견적 상자와 멀어짐 → 합계 바로 아래·구매 단추 바로 위에
+      var btns = document.querySelector('.item_tit_detail_cont > .btn_choice_box');
+      if (btns && btns.offsetParent) btns.parentNode.insertBefore(c, btns);
+      else add.parentNode.insertBefore(c, add.nextSibling);
       return;
     }
     var n = document.querySelector('.dbh-b');                       // 휴대폰: 구매 띠의 '로그인 없이' 줄을 견적 안내로
