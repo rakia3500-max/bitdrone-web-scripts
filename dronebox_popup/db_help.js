@@ -23,7 +23,7 @@
    K2(11-19): 휴대폰 상품 화면 구매 창이 열려 있는 동안 상담 동그라미 숨김(가격 줄을 가림)
    I(11-19): PC 상세 정보 줄(제조사~고객상담)을 연회색 카드 2칸으로 + 추가상품 이름 칸 단어 단위 줄바꿈 + 이름·값 줄 세로 쌓임 방지(값 칸 남은 폭)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
-   W(11-23): 필기 기출문제 화면 위·끝에 '입문 드론 보기 · 자격증·교육 상담' 줄 (11-22 녹화, 37분 문제만 풀고 나감)
+   W(11-23): 필기 기출문제 화면 위·끝에 '입문 드론 보기 · 자격증·교육 카톡 상담' 줄 (11-22 녹화, 37분 문제만 풀고 나감)
    Y(11-23): 산업용 상품 PC 상세 — 내려가면 화면 아래 띠(가격·카톡 견적 요청·전화·구매하기) (11-22 녹화 1572)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
@@ -627,7 +627,8 @@
     function box(id, title, sub) {
       var d = document.createElement('div'); d.id = id; d.className = 'dbh-dtx';
       d.innerHTML = '<div class="t">' + title + '<em>' + sub + '</em></div><a class="p" href="/goods/goods_main.php?sno=94">입문 드론 보기 ›</a>' +
-        '<a class="s" href="tel:' + TEL + '">자격증·교육 상담 ›</a>';
+        '<a class="s" href="#">자격증·교육 카톡 상담 ›</a>';
+      d.querySelector('a.s').addEventListener('click', function (e) { e.preventDefault(); kakao(); });   // 11-23 사장님: PC에선 전화 링크가 반응 없음 → 카톡(없으면 전화)
       return d;
     }
     function put() {
