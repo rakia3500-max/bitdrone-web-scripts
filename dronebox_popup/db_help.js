@@ -23,6 +23,8 @@
    K2(11-19): 휴대폰 상품 화면 구매 창이 열려 있는 동안 상담 동그라미 숨김(가격 줄을 가림)
    I(11-19): PC 상세 정보 줄(제조사~고객상담)을 연회색 카드 2칸으로 + 추가상품 이름 칸 단어 단위 줄바꿈 + 이름·값 줄 세로 쌓임 방지(값 칸 남은 폭)
    P(11-18): 단품 상품(MIC3 송신기 1373)에 '수신기·케이스 없음 + 세트 보기' 줄 (네이버에서 세트로 알고 왔다가 1분 안에 나감)
+   W(11-23): 필기 기출문제 화면 위·끝에 '입문 드론 보기 · 자격증·교육 상담' 줄 (11-22 녹화, 37분 문제만 풀고 나감)
+   Y(11-23): 산업용 상품 PC 상세 — 내려가면 화면 아래 띠(가격·카톡 견적 요청·전화·구매하기) (11-22 녹화 1572)
    개인정보·쿠키를 읽거나 밖으로 보내지 않음. 화면 글자·배치만 바꿈. 빼면 원래대로. */
 (function () {
   var FREE = 50000;
@@ -609,8 +611,67 @@
       .observe(document.body, {childList: true, subtree: true});
   }
 
+  // 2026-11-23 W: 필기 기출문제 화면(event/dronetest) 위 탭 아래·문제 목록 끝에 '입문 드론 보기 · 자격증·교육 상담' 줄
+  //   (11-22 녹화: 손님 2명이 37분 동안 문제만 풀고 상품으로는 안 넘어감)
+  function testLinks() {
+    if (!/htmid=event\/dronetest/.test(location.search)) return;
+    if (!document.getElementById('dbh-dtx-css')) {
+      var st = document.createElement('style'); st.id = 'dbh-dtx-css';
+      st.textContent = '.dbh-dtx{max-width:1100px;margin:18px auto;padding:16px 18px;border:1px solid #D3E3F4;border-radius:12px;background:#EEF4FB;display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;text-align:left;font-family:inherit;box-sizing:border-box}' +
+        '.dbh-dtx .t{flex:1 1 260px;font-size:15px;color:#191F28;line-height:1.5}.dbh-dtx .t b{color:#1F67B1}.dbh-dtx .t em{display:block;font-style:normal;font-size:13px;color:#4E5968}' +
+        '.dbh-dtx a{display:inline-block;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}' +
+        '.dbh-dtx a.p{background:#1F67B1;color:#fff}.dbh-dtx a.s{background:#fff;color:#1F67B1;border:1px solid #B9D3EE}' +
+        (mob ? '.dbh-dtx{margin:14px 12px}.dbh-dtx .t{font-size:14px}.dbh-dtx a{font-size:13px;padding:9px 14px}' : '');
+      document.head.appendChild(st);
+    }
+    function box(id, title, sub) {
+      var d = document.createElement('div'); d.id = id; d.className = 'dbh-dtx';
+      d.innerHTML = '<div class="t">' + title + '<em>' + sub + '</em></div><a class="p" href="/goods/goods_main.php?sno=94">입문 드론 보기 ›</a>' +
+        '<a class="s" href="tel:' + TEL + '">자격증·교육 상담 ›</a>';
+      return d;
+    }
+    function put() {
+      var tab = document.querySelector('.howtouse'); if (!tab) return;
+      if (!document.getElementById('dbh-dtx1')) tab.parentNode.insertBefore(box('dbh-dtx1', '<b>필기 공부 중이세요?</b> 실기는 기체로 연습해요', '자격증 준비용 입문 드론과 교육 상담을 한곳에서'), tab.nextSibling);
+      if (!document.getElementById('dbh-dtx2')) tab.parentNode.appendChild(box('dbh-dtx2', '<b>문제 다 푸셨나요?</b> 다음은 실기 연습', '입문 드론을 보거나, 자격증·교육 일정을 상담해 보세요'));
+    }
+    put(); setTimeout(put, 1500); setTimeout(put, 4000);
+  }
+  // 2026-11-23 Y: 산업용 상품 PC 상세 — 구매 단추 아래로 내려가면 화면 아래에 띠(사진·이름·가격 · 카톡 견적 요청 · 전화 · 구매하기)
+  //   (11-22 녹화: 1572 PC 손님이 5분 읽고 나감 — 1,500px만 내려가도 견적·구매 단추가 화면에 하나도 없었음)
+  function indBar() {
+    if (mob || path.indexOf('goods_view') < 0 || document.getElementById('dbh-ibar')) return;
+    var nmEl = document.querySelector('.item_detail_tit h3, .item_detail_tit');
+    var nm = (nmEl && (nmEl.innerText || nmEl.textContent) || '').split('\n')[0].trim();
+    if (!IND.test(document.title + ' ' + nm)) return;
+    var choice = document.querySelector('.btn_choice_box'); if (!choice) return;
+    var pr = [].filter.call(document.querySelectorAll('.item_detail_list dd strong, .item_price strong'), function (e) { return /\d/.test(e.textContent); })[0];
+    var img = (document.querySelector('.item_photo_big img, #mainImage img, .item_photo_view img') || {}).src || '';
+    var st = document.createElement('style');
+    st.textContent = '#dbh-ibar{position:fixed;left:0;right:0;bottom:0;z-index:900;background:#fff;border-top:1px solid #E5E8EB;box-shadow:0 -6px 18px rgba(20,30,40,.08);transform:translateY(110%);transition:transform .25s}' +
+      '#dbh-ibar.on{transform:none}#dbh-ibar .in{max-width:1100px;margin:0 auto;padding:10px 0;display:flex;align-items:center;gap:14px;font-family:inherit}' +
+      '#dbh-ibar img{width:48px;height:48px;object-fit:contain;border-radius:8px;background:#F4F6F8}' +
+      '#dbh-ibar .n{flex:1;min-width:0;font-size:14px;color:#191F28;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+      '#dbh-ibar .n em{display:block;font-style:normal;font-size:16px;font-weight:800;color:#1F67B1}' +
+      '#dbh-ibar a{display:inline-block;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}' +
+      '#dbh-ibar a.q{background:#1F67B1;color:#fff}#dbh-ibar a.c{background:#fff;color:#191F28;border:1px solid #D1D6DB}#dbh-ibar a.b{background:#191F28;color:#fff}';
+    document.head.appendChild(st);
+    var b = document.createElement('div'); b.id = 'dbh-ibar';
+    b.innerHTML = '<div class="in"><img alt=""><div class="n"><span></span><em></em></div>' +
+      '<a class="q" href="#">카톡 견적 요청</a><a class="c" href="tel:' + IND_TEL + '">전화 ' + IND_TEL + '</a><a class="b" href="#">구매하기</a></div>';
+    if (img) b.querySelector('img').src = img; else b.querySelector('img').style.display = 'none';
+    b.querySelector('.n span').textContent = nm;
+    b.querySelector('.n em').textContent = pr ? txt(pr).replace(/원$/, '') + '원' : '';
+    document.body.appendChild(b);
+    b.querySelector('a.b').addEventListener('click', function (e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    b.querySelector('a.q').addEventListener('click', function (e) { e.preventDefault(); kakao(); });
+    function chk() { var lim = choice.getBoundingClientRect().bottom + window.pageYOffset; b.className = window.pageYOffset > lim ? 'on' : ''; }
+    window.addEventListener('scroll', chk, { passive: true }); chk();
+  }
+
   function run() {
     css();
+    try { testLinks(); } catch (e) {}
     try { priceWatch(); } catch (e) {}
     try { telUnifyLater(); } catch (e) {}
     try { visitLater(); } catch (e) {}
@@ -620,6 +681,7 @@
     [qaHelp, crumbFix, couponHelp, crumbLogin, setGuide].forEach(function (f) { try { f(); } catch (e) {} });   // PC·휴대폰 모두
     if (!mob) { try { guestUpPc(); } catch (e) {} }
     if (!mob) { try { quoteGoods(); } catch (e) {} }
+    if (!mob) { try { indBar(); setTimeout(indBar, 2000); } catch (e) {} }
     if (!mob) return;                         // B·C·D·E는 휴대폰 화면만 (X는 CSS로 PC도)
     [smallChat, buyNote, guestUp, freeShip, quoteGoods].forEach(function (f) { try { f(); } catch (e) {} });   // quoteGoods는 buyNote 뒤(그 줄을 바꿈)
   }
