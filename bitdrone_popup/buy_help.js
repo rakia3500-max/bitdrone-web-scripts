@@ -7,6 +7,7 @@
    I(11-16): 아이콘 4칸 개편 — 산업용 DJI 공식수입·방문납품(700만↑)/무료배송·기술서포트·유지보수, 컨슈머 DJI 공식수입·방문납품/무료배송·적립·기술서포트
    U(11-13): 견적 상품은 PC 아래 고정 띠 글자를 '견적 요청하기 (카톡·전화)' 한 칸으로
    T(11-13): 타일을 누르면 아래에 숨긴 원래 정보 표 문구를 한 줄로(눌러도 반응 없던 '막힌 클릭' 대응)
+   K(11-23): 케어 상품 가격 아래 '이 케어가 붙는 장비' 바로 가기(CARE_FOR 표, 852 → 629·550)
    L(11-18): 상세 본문의 구성품 이름 → 그 상품 링크 (M5T 804 '인텔리전트 플라이트 배터리'를 눌러도 반응 없던 막힌 클릭, 11-16·17 녹화)
    되돌리기: 카페24 스크립트 태그에서 이 파일만 빼면 원래대로 */
 (function () {
@@ -276,6 +277,34 @@
     });
   }
   function partLinksLater() { partLinks(); setTimeout(partLinks, 1500); setTimeout(partLinks, 4000); }   // 상세 본문이 늦게 그려질 때
+  // 2026-11-23 K: 케어 상품 → 이 케어가 붙는 장비 바로 가기(가격 아래 아이콘 칸 맨 위). 852 손님이 장비를 찾아 분류를 7분 돌다 나감(11-22 녹화).
+  //   케어 상품 번호: [[장비 번호, 보이는 이름, 작은 사진], …]  — 다른 케어 상품도 한 줄씩 추가
+  var CARE_FOR = {
+    852: [[629, '젠뮤즈 L3 라이다', 'https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/product/small/20251112/d255ad2103f1e5ebc9a7635b8d3461a3.png'],
+          [550, '매트리스 400 RTK', 'https://ecimg.cafe24img.com/pg724b63244550007/dronebox2/web/product/small/20250617/b4bac31edc6ff009cd63f761aebb74ab.jpg']]
+  };
+  function careFor() {
+    var m = location.search.match(/product_no=(\d+)/) || location.pathname.match(/\/(\d+)\/category\//);
+    var L = m && CARE_FOR[+m[1]]; if (!L) return;
+    var cs = document.createElement('style');
+    cs.textContent = '.bdh-care{margin:0 0 10px;padding:12px 14px;border:1px solid #E5E8EB;border-radius:10px;background:#F9FAFB;font-size:13px;color:#4E5968;text-align:left}' +
+      '.bdh-care b{display:block;color:#191F28;font-size:13.5px;margin-bottom:8px}.bdh-care .r{display:flex;gap:8px;flex-wrap:wrap}' +
+      '.bdh-care a{display:flex;align-items:center;gap:8px;flex:1 1 180px;min-width:0;padding:7px 10px;border:1px solid #E5E8EB;border-radius:8px;background:#fff;color:#191F28;font-weight:600;text-decoration:none}' +
+      '.bdh-care a:hover{border-color:#191F28}.bdh-care img{width:36px;height:36px;object-fit:contain;flex:none}.bdh-care a span{flex:1;min-width:0}' +
+      '.bdh-care a em{display:block;font-style:normal;font-weight:500;color:#8B95A1;font-size:12px}';
+    document.head.appendChild(cs);
+    function put() {
+      if (document.getElementById('bdh-care')) return;
+      var v = document.querySelector('#infoArea .ivc'); if (!v) return;
+      var d = document.createElement('div'); d.id = 'bdh-care'; d.className = 'bdh-care';
+      d.innerHTML = '<b>이 케어가 붙는 장비</b><div class="r">' + L.map(function (x) {
+        return '<a href="/product/detail.html?product_no=' + x[0] + '"><img src="' + x[2] + '" alt=""><span>' + x[1] + '<em>장비 보러 가기 ›</em></span></a>';
+      }).join('') + '</div>';
+      v.insertBefore(d, v.firstChild);
+    }
+    var k = 0, t = setInterval(function () { put(); if (++k > 40) clearInterval(t); }, 500); put();   // 아이콘 칸이 늦게 다시 그려져도 20초 동안 다시 넣음
+  }
+  try { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', careFor); else careFor(); } catch (e) {}
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
   try { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', partLinksLater); else partLinksLater(); } catch (e) {}
 })();
