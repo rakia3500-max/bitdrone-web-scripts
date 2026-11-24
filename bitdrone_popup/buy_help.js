@@ -8,6 +8,7 @@
    U(11-13): 견적 상품은 PC 아래 고정 띠 글자를 '견적 요청하기 (카톡·전화)' 한 칸으로
    T(11-13): 타일을 누르면 아래에 숨긴 원래 정보 표 문구를 한 줄로(눌러도 반응 없던 '막힌 클릭' 대응)
    K(11-23): 케어 상품 가격 아래 '이 케어가 붙는 장비' 바로 가기(CARE_FOR 표, 852 → 629·550)
+   V(11-24): 부품·케어 상품 가격 아래 세 줄 띠(정품·평일 2시 전 당일 출고/품절 카톡 문의·호환 기종, TRUST3 표)
    L(11-18): 상세 본문의 구성품 이름 → 그 상품 링크 (M5T 804 '인텔리전트 플라이트 배터리'를 눌러도 반응 없던 막힌 클릭, 11-16·17 녹화)
    되돌리기: 카페24 스크립트 태그에서 이 파일만 빼면 원래대로 */
 (function () {
@@ -305,6 +306,39 @@
     var k = 0, t = setInterval(function () { put(); if (++k > 40) clearInterval(t); }, 500); put();   // 아이콘 칸이 늦게 다시 그려져도 20초 동안 다시 넣음
   }
   try { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', careFor); else careFor(); } catch (e) {}
+  // 2026-11-24 V: 부품·케어 상품 가격 아래 '세 줄 띠' ① DJI 정품 ② 평일 오후 2시 전 결제 당일 출고(케어는 '등록 안내', 품절이면 '지금 품절 · 카톡 문의') ③ 호환 기종/대상 기체.
+  //   네이버 유입 손님이 1분 안에 나감(11-23 녹화) — 사장님 시안 OK·당일 출고 2시 기준. 상품 번호: [종류 part|care, 호환·대상] 한 줄씩 추가
+  var TRUST3 = {
+    305: ['part', '미니4 프로 · 미니3 시리즈'],
+    607: ['part', 'DJI Mic 3 · 아이폰(라이트닝 단자)'],
+    379: ['part', 'USB-C PD 충전 기기(DJI 드론 충전 허브·조종기 등)'],
+    487: ['care', 'DJI 아바타2'],
+    452: ['care', '매빅3 엔터프라이즈 열화상(3T)']
+  };
+  function trust3() {
+    var m = location.search.match(/product_no=(\d+)/) || location.pathname.match(/\/(\d+)\/category\//);
+    var T = m && TRUST3[+m[1]]; if (!T) return;
+    var ok = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="#E8F3FF"/><path d="M6 10.3l2.6 2.6L14.2 7.4" fill="none" stroke="#1B64DA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var st = document.createElement('style');
+    st.textContent = '.bdh-t3{margin:0 0 10px;padding:12px 14px;border:1px solid #E5E8EB;border-radius:10px;background:#fff;text-align:left}' +
+      '.bdh-t3 div{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:14px;line-height:1.5;color:#4E5968}' +
+      '.bdh-t3 svg{flex:none}.bdh-t3 b{flex:none;min-width:64px;color:#191F28;font-weight:700}';
+    document.head.appendChild(st);
+    function put() {
+      if (document.getElementById('bdh-t3')) return;
+      var v = document.querySelector('#infoArea .ivc'); if (!v) return;
+      var sold = [].some.call(document.querySelectorAll('#infoArea img, .xans-product-action a, .btnSubmit, #actionBuy, .action_button a'), function (e) { return /품절/.test((e.alt || '') + (e.textContent || '')); });
+      var rows = [['DJI 정품', '국내 정식 수입 · 공식 A/S 가능'],
+        sold ? ['지금 품절', '입고 예정은 <a href="https://pf.kakao.com/_xfExiyd/chat" target="_blank" rel="noopener" style="color:#1B64DA;font-weight:700;text-decoration:underline">카톡으로 물어보세요 ›</a>']
+          : T[0] === 'care' ? ['등록 안내', '결제 후 케어 등록 방법을 따로 안내해 드려요'] : ['당일 출고', '평일 오후 2시 전 결제 시 오늘 보내 드려요'],
+        [T[0] === 'care' ? '대상 기체' : '호환 기종', T[1]]];
+      var d = document.createElement('div'); d.id = 'bdh-t3'; d.className = 'bdh-t3';
+      d.innerHTML = rows.map(function (r) { return '<div>' + ok + '<b>' + r[0] + '</b><span>' + r[1] + '</span></div>'; }).join('');
+      v.insertBefore(d, v.firstChild);
+    }
+    var k = 0, t = setInterval(function () { put(); if (++k > 40) clearInterval(t); }, 500); put();   // 아이콘 칸이 늦게 다시 그려져도 20초 동안 다시 넣음
+  }
+  try { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', trust3); else trust3(); } catch (e) {}
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
   try { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', partLinksLater); else partLinksLater(); } catch (e) {}
 })();
